@@ -1,0 +1,10 @@
+### GET request to example server
+POST http://localhost:3018/api/v1/commands/run-project/liberty
+content-type: application/json
+
+{
+  "workers":1,
+  "retries":0,
+  "headed":false
+}
+###

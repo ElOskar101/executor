@@ -1,0 +1,35 @@
+{
+  "name": "executor",
+  "version": "1.0.0",
+  "description": "Basic Express API starter with Swagger and Morgan",
+  "main": "dist/src/server.js",
+  "scripts": {
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "test": "npm run build && node --test dist/test/**/*.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mongoose": "^7.3.3",
+    "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.23",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.21",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/supertest": "^6.0.3",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

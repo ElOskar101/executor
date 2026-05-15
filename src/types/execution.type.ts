@@ -1,6 +1,7 @@
 import {Types} from "mongoose";
 
 export type ExecutionStatus = 'queued' | 'running' | 'completed' | 'error' | 'unknown' | 'cancelled' | 'failed';
+export type modes = 'serial' | 'default' | 'parallel' | undefined;
 
 export interface CreateExecutionRequest {
     project: string;
@@ -12,6 +13,7 @@ export interface CreateExecutionRequest {
     clinic?: string;
     execution?: string;
     bot?: string;
+    mode?: modes;
 }
 
 export interface ExecutionJobData {
@@ -20,6 +22,7 @@ export interface ExecutionJobData {
     workers: number;
     retries: number;
     headed: boolean;
+    mode?: modes;
     playwrightFolder: string;
 }
 

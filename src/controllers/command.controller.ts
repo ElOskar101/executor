@@ -6,9 +6,9 @@ import { createExecution as createQueuedExecution, stopExecutionById } from "../
 export const runProject = async (req: Request, res: Response) => {
   try{
     const { project } = req.params;
-    const {workers=1, retries=0, headed=false} = req.body as RunOptions;
+    const {workers=1, retries=0, headed=false, mode} = req.body as RunOptions;
 
-    const execution = await createQueuedExecution({ project, workers, retries, headed });
+    const execution = await createQueuedExecution({ project, workers, retries, headed, mode });
     onSuccess(execution, res);
   }catch (e) {
     if (e instanceof Error && (e.message.includes("not allowed") || e.message.includes("not configured"))) {

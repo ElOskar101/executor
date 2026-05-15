@@ -1,5 +1,5 @@
 ### GET request to example server
-POST http://localhost:3018/api/v1/executions
+POST http://localhost:3017/api/v1/executions
 content-type: application/json
 
 {
@@ -11,12 +11,30 @@ content-type: application/json
   "client": "Petite Smiles",
   "clinic": "Doral",
   "execution": "2026-04-27",
-  "bot": "Liberty Dental Plan"
+  "bot": "Liberty Dental Plan",
+    "mode": "parallel"
 }
 
 ### GET request to example server
 GET http://localhost:3018/api/v1/executions/6a04f44f3193a3f489ddb3a8
 content-type: application/json
+
+### GET request to example server
+POST https://api.controlcentralcarrier.com/api/v1/executions
+content-type: application/json
+
+{
+  "project": "liberty",
+  "workers": 2,
+  "retries": 3,
+  "headed": false,
+  "createdBy": "Oscar Gonzalez",
+  "client": "Petite Smiles",
+  "clinic": "Doral",
+  "execution": "2026-04-27",
+  "bot": "Liberty Dental Plan",
+  "mode": "parallel"
+}
 
 
 

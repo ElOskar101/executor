@@ -17,6 +17,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Reports artifacts (keep folder, ignore generated contents)
+reports/*
+!reports/.gitkeep
+
 # IDE / OS
 .idea/
 .vscode/

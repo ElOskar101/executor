@@ -39,6 +39,7 @@ export async function createExecution(payload: CreateExecutionRequest) {
     const jobData: ExecutionJobData = {
         executionId: execution.id,
         project: payload.project,
+        mode: payload.mode,
         workers: normalizePositiveInteger(payload.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 8)),
         retries: normalizeRetries(payload.retries),
         headed: Boolean(payload.headed),

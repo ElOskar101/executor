@@ -91,7 +91,7 @@ async function handleStopJob(job: Job<ExecutionJobData>) {
 }
 
 async function handleExecutionJob(job: Job<ExecutionJobData>) {
-    const { executionId, project, workers, retries, headed, playwrightFolder } = job.data;
+    const { executionId, project, workers, retries, headed, playwrightFolder, mode } = job.data;
     assertAllowedPlaywrightProject(project);
 
     console.info(
@@ -99,7 +99,7 @@ async function handleExecutionJob(job: Job<ExecutionJobData>) {
     );
 
     const logStream = createExecutionLogStream(executionId);
-    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder });
+    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: job.id || '1', mode });
 
     activeProcesses.set(executionId, { child, stopping: false });
 

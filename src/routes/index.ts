@@ -11,8 +11,16 @@ router.get('/', (req: Request, res: Response) => {
   });
 });
 
+router.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
 router.use('/api/v1', commandRoute);
 router.use('/api/v1', executionRoute);
+router.use('/', executionRoute);
 console.info("[SERVER] Routes loaded");
 export default router;
-

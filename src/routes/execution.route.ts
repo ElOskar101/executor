@@ -1,13 +1,21 @@
 import express from 'express';
 
-import {runProject, stopExecution} from '../controllers/command.controller';
+import {
+    createExecution,
+    deleteExecution,
+    getExecution,
+    getExecutions,
+    stopExecution,
+    updateExecution
+} from '../controllers/execution.controller';
 
 const router = express.Router();
 
-
-router.post('/execution/run-project/:project', runProject);
-router.post('/execution/stop-project/:serviceId', stopExecution);
-//router.post('/commands/show-last-logs/:project', runBot);
+router.post('/executions', createExecution);
+router.get('/executions', getExecutions);
+router.get('/executions/:id', getExecution);
+router.post('/executions/:id/stop', stopExecution);
+router.patch('/executions/:id', updateExecution);
+router.delete('/executions/:id', deleteExecution);
 
 export default router;
-

@@ -1,10 +1,23 @@
 ### GET request to example server
-POST http://localhost:3018/api/v1/commands/run-project/liberty
+POST http://localhost:3018/api/v1/executions
 content-type: application/json
 
 {
-  "workers":1,
-  "retries":0,
-  "headed":false
+  "project": "liberty",
+  "workers": 2,
+  "retries": 3,
+  "headed": false,
+  "createdBy": "Oscar Gonzalez",
+  "client": "Petite Smiles",
+  "clinic": "Doral",
+  "execution": "2026-04-27",
+  "bot": "Liberty Dental Plan"
 }
+
+### GET request to example server
+GET http://localhost:3018/api/v1/executions/6a04f44f3193a3f489ddb3a8
+content-type: application/json
+
+
+
 ###

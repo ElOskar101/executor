@@ -1,9 +1,12 @@
 import { Schema, model} from "mongoose";
 
 const ExecutionSchema = new Schema({
+    jobId: String,
     pid: Number,
     createdBy: String,
-    status: {type:String, required:true, enum:['running', 'stopped', 'error', 'unknown', 'cancelled']},
+    playwrightProject: String,
+    playwrightExecutionId: String,
+    status: {type:String, required:true, enum:['queued', 'running', 'completed', 'error', 'unknown', 'cancelled', 'failed']},
     startedAt: Date,
     finishedAt: Date,
     error: String,
@@ -11,10 +14,10 @@ const ExecutionSchema = new Schema({
     attachments: [String],
     outputPath: String,
     logsPath: String,
-    clientId: String,
-    clinicId: String,
-    executionId: String,
-    botId: String,
+    client: String,
+    clinic: String,
+    execution: String,
+    bot: String,
 }, {
     timestamps: true,
     versionKey: false
@@ -23,8 +26,12 @@ const ExecutionSchema = new Schema({
 ExecutionSchema.index(
     { createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 90 } // ~90 days (3 months)
 );
+
 ExecutionSchema.index(
-    { botId: 1, status: 1}, { unique: true }
+    { client: 1, clinic: 1, execution: 1, bot: 1 },
 );
+
+ExecutionSchema.index({ jobId: 1 });
+ExecutionSchema.index({ status: 1, createdAt: -1 });
 
 export const ExecutionModel =  model("Execution", ExecutionSchema);

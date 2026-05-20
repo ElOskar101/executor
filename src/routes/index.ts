@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 
-import commandRoute from './command.routes';
 import executionRoute from './execution.route';
 
 const router = express.Router();
@@ -19,7 +18,6 @@ router.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
-router.use('/api/v1', commandRoute);
 router.use('/api/v1', executionRoute);
 router.use('/', executionRoute);
 console.info("[SERVER] Routes loaded");

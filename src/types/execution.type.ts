@@ -1,19 +1,52 @@
-import {Types} from "mongoose";
+import { Types } from "mongoose";
 
-export type ExecutionStatus = 'queued' | 'running' | 'completed' | 'error' | 'unknown' | 'cancelled' | 'failed';
-export type modes = 'serial' | 'default' | 'parallel' | undefined;
+export type ExecutionStatus = 'queued' | 'running' | 'completed' | 'unknown' | 'cancelled' | 'failed';
+export type PlaywrightMode = 'serial' | 'default' | 'parallel' | undefined;
+export type ExecutionType = 'elg' | 'fbd';
 
-export interface CreateExecutionRequest {
+interface Patient { // Patient that would be tested in playwright
+    patientName: string,
+    patientLastName: string,
+    patientMemberId: string,
+    patientDob: string,
+    policyHolderName: string,
+    policyHolderLastName: string,
+    policyHolderDob: string,
+    relationship: string,
+    zipCode: string,
+    clinic: string,
+    verificationType: ExecutionType,
+    filenames: string,
+    otherInformation: Record<string, unknown>
+}
+
+interface Bot {// Bot information that would be used for playwright execution
+    botName: string,
+    targetUrl: string,
+    username: string,
+    password: string,
+    otherInformation: Record<string, unknown>
+}
+
+export interface CreateExecutionRequest {// Only for http request. It is basically the payload of the request (req.body)
     project: string;
-    workers?: number;
-    retries?: number;
-    headed?: boolean;
     createdBy?: string;
     client?: string;
     clinic?: string;
     execution?: string;
-    bot?: string;
-    mode?: modes;
+    botName?: string;
+    meta: {
+        bot: Bot,
+        patients: Array<Patient>,
+        config: Record<string, unknown>
+        rv: Record<string, unknown>
+        outputPath?: string,
+        logsPath?: string,
+        workers?: number,
+        retries?: number,
+        headed?: boolean,
+        playwrightMode?: PlaywrightMode,
+    };
 }
 
 export interface ExecutionJobData {
@@ -22,28 +55,37 @@ export interface ExecutionJobData {
     workers: number;
     retries: number;
     headed: boolean;
-    mode?: modes;
+    playwrightMode?: PlaywrightMode;
     playwrightFolder: string;
 }
 
 export default interface Execution {
-    _id: Types.ObjectId;
-    jobId?: string;
-    pid?: number;
-    createdBy?: string;
-    playwrightProject?: string;
-    playwrightExecutionId?: string;
-    status: ExecutionStatus;
-    startedAt?: Date;
-    finishedAt?: Date;
-    error?: string;
-    note?: string[];
-    attachments?: string[];
-    output?: string;
-    client?: string;
-    clinic?: string;
-    execution?: string;
-    bot?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+    _id: Types.ObjectId,
+    // Execution properties only for record keeping (creation, update, runtime jobs)
+    runId: string,
+    playwrightProject: string,
+    status: ExecutionStatus
+    startedAt: Date,
+    finishedAt: Date,
+    notes: string[],
+    // Control properties for requesting filters (GETs, http requests after execution)
+    createdBy: string,
+    client: string,
+    clinic: string,
+    execution: string,
+    botName: string,
+    // Playwright execution properties needed for playwright project runtime. It is like runtime context
+    // (Runtime context for execution in playwright)
+    meta:{
+        bot: Bot,
+        patients: Array<Patient>,
+        config: Record<string, unknown>
+        rv: Record<string, unknown>
+        outputPath?: string,
+        logsPath?: string,
+        workers?: number,
+        retries?: number,
+        playwrightMode?: PlaywrightMode,
+        headed?: boolean,
+    }
 }

@@ -91,7 +91,7 @@ async function handleStopJob(job: Job<ExecutionJobData>) {
 }
 
 async function handleExecutionJob(job: Job<ExecutionJobData>) {
-    const { executionId, project, workers, retries, headed, playwrightFolder, mode } = job.data;
+    const { executionId, project, workers, retries, headed, playwrightFolder, playwrightMode } = job.data;
     assertAllowedPlaywrightProject(project);
 
     console.info(
@@ -99,7 +99,7 @@ async function handleExecutionJob(job: Job<ExecutionJobData>) {
     );
 
     const logStream = createExecutionLogStream(executionId);
-    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: job.id || '1', mode });
+    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: job.id || '1', playwrightMode });
 
     activeProcesses.set(executionId, { child, stopping: false });
 
@@ -150,19 +150,24 @@ async function handleExecutionJob(job: Job<ExecutionJobData>) {
             logStream.write(`\n[system] ${error.message}\n`);
             await closeLogStream(logStream);
             await ExecutionModel.findByIdAndUpdate(executionId, {
-                status: "error",
-                error: error.message,
-                finishedAt: new Date(),
+                $set: {
+                    status: "failed" satisfies ExecutionStatus,
+                    //error: error.message,
+                    finishedAt: new Date(),
+                },
+                $addToSet: {
+                    notes: error.message,
+                },
             });
             await publishStatus({
                 executionId,
                 jobId: job.id,
-                status: "error",
+                status: "failed",
                 error: error.message,
             });
             reject(error);
         });
-
+        // When process ends (naturally or killed by user interaction)
         child.on("close", async (code, signal) => {
             const activeProcess = activeProcesses.get(executionId);
             const cancelled = activeProcess?.stopping || signal === "SIGTERM" || signal === "SIGKILL";
@@ -177,11 +182,25 @@ async function handleExecutionJob(job: Job<ExecutionJobData>) {
             logStream.write(`\n[system] Finished with status=${status} code=${code} signal=${signal || ""}\n`);
             await closeLogStream(logStream);
 
-            await ExecutionModel.findByIdAndUpdate(executionId, {
-                status,
-                error,
-                finishedAt: new Date(),
-            });
+            const closeUpdate = error
+                ? {
+                    $set: {
+                        status,
+                        //error,
+                        finishedAt: new Date(),
+                    },
+                    $addToSet: {
+                        notes: error,
+                    },
+                }
+                : {
+                    $set: {
+                        status,
+                        finishedAt: new Date(),
+                    },
+                };
+
+            await ExecutionModel.findByIdAndUpdate(executionId, closeUpdate);
             await publishStatus({
                 executionId,
                 jobId: job.id,

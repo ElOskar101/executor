@@ -1,18 +1,50 @@
 ### GET request to example server
-POST http://localhost:3017/api/v1/executions
+POST http://localhost:3018/api/v1/executions
 content-type: application/json
 
 {
   "project": "liberty",
-  "workers": 2,
-  "retries": 3,
-  "headed": false,
   "createdBy": "Oscar Gonzalez",
-  "client": "Petite Smiles",
-  "clinic": "Doral",
-  "execution": "2026-04-27",
-  "bot": "Liberty Dental Plan",
-    "mode": "parallel"
+  "client": "Salt Dental Partners",
+  "clinic": "Smile For Kids ",
+  "botName": "Liberty Dental Plan",
+  "meta": {
+    "bot": {
+      "botName": "Liberty Dental Plan",
+      "targetUrl": "https://providerportal.libertydentalplan.com",
+      "username": "71stDepot",
+      "password": "Dental1234!",
+      "otherInformation": {
+        "specifyPayer": "None"
+      }
+    },
+    "patients": [
+      {
+        "patientName": "Ana",
+        "patientLastName": "Lopez",
+        "patientMemberId": "A10001",
+        "patientDob": "1985-03-10",
+        "policyHolderName": "Ana",
+        "policyHolderLastName": "Lopez",
+        "policyHolderDob": "1985-03-10",
+        "relationship": "self",
+        "zipCode": "90001",
+        "clinic": "Downtown Clinic",
+        "verificationType": "elg",
+        "filenames": "ana-lopez.pdf",
+        "otherInformation": {
+          "plan": "Gold"
+        }
+      }
+    ],
+    "config": {},
+    "rv": {},
+    "outputPath": "/tmp/reports",
+    "logsPath": "/tmp/logs",
+    "workers": 2,
+    "retries": 1,
+    "playwrightMode": "parallel"
+  }
 }
 
 ### GET request to example server
@@ -25,15 +57,47 @@ content-type: application/json
 
 {
   "project": "liberty",
-  "workers": 2,
-  "retries": 3,
-  "headed": false,
-  "createdBy": "Oscar Gonzalez",
-  "client": "Petite Smiles",
-  "clinic": "Doral",
-  "execution": "2026-04-27",
-  "bot": "Liberty Dental Plan",
-  "mode": "parallel"
+  "createdBy": "Oscar Gonzalez", // (opcional)
+  "client": "Salt Dental Partners", // (opcional)
+  "clinic": "Smile For Kids ", // (opcional)
+  "botName": "Liberty Dental Plan", // (opcional)
+  "meta": {
+    "bot": {
+      "botName": "Liberty Dental Plan",
+      "targetUrl": "https://providerportal.libertydentalplan.com",
+      "username": "71stDepot",
+      "password": "Dental1234!",
+      "otherInformation": {
+        "specifyPayer": "None"
+      }
+    },
+    "patients": [
+      {
+        "patientName": "Ana",
+        "patientLastName": "Lopez",
+        "patientMemberId": "A10001",
+        "patientDob": "1985-03-10",
+        "policyHolderName": "Ana",
+        "policyHolderLastName": "Lopez",
+        "policyHolderDob": "1985-03-10",
+        "relationship": "self",
+        "zipCode": "90001",
+        "clinic": "Downtown Clinic",
+        "verificationType": "elg",
+        "filenames": "ana-lopez.pdf",
+        "otherInformation": {
+          "plan": "Gold"
+        }
+      }
+    ],
+    "config": {},
+    "rv": {},
+    "outputPath": "/tmp/reports", // (opcional)
+    "logsPath": "/tmp/logs", // (opcional)
+    "workers": 2, // (opcional)
+    "retries": 1, // (opcional)
+    "playwrightMode": "parallel" // (opcional)
+  }
 }
 
 

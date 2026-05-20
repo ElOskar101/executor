@@ -1,30 +1,67 @@
 import { Schema, model} from "mongoose";
 
+
+const bot = new Schema({ // For playwright project
+    botName: {type: String},
+    targetUrl: {type: String},
+    username: {type: String},
+    password: {type: String},
+    otherInformation:{type:Schema.Types.Mixed, default:{}},
+}, {
+    _id: false, versionKey: false, timestamps: false});
+
+const patient = new Schema({ // Patient that would be tested in playwright
+    patientName: {type: String},
+    patientLastName:{type: String},
+    patientMemberId: {type: String},
+    patientDob: {type: String},
+    policyHolderName: {type: String},
+    policyHolderLastName: {type: String},
+    policyHolderDob: {type: String},
+    relationship: {type: String},
+    zipCode: {type: String},
+    clinic:{type: String},
+    verificationType: {type: String, enum:['elg', 'fbd']},
+    filenames:{type:String},
+    otherInformation:{type:Schema.Types.Mixed, default:{}},
+
+}, {_id: false, versionKey: false, timestamps: false});
+
 const ExecutionSchema = new Schema({
-    jobId: String,
-    pid: Number,
-    createdBy: String,
+    // Execution properties only for record keeping (creation, update, runtime jobs)
+    runId: String,
     playwrightProject: String,
-    playwrightExecutionId: String,
-    status: {type:String, required:true, enum:['queued', 'running', 'completed', 'error', 'unknown', 'cancelled', 'failed']},
+    status: {type:String, required:true, enum:['queued', 'running', 'completed', 'unknown', 'cancelled', 'failed']},
     startedAt: Date,
     finishedAt: Date,
-    error: String,
-    note: [String],
-    attachments: [String],
-    outputPath: String,
-    logsPath: String,
+    notes: [String],
+    // Control properties for requesting filters (GETs, http requests after execution)
+    createdBy: String,
     client: String,
     clinic: String,
     execution: String,
-    bot: String,
+    botName: String,
+    // Playwright execution properties needed for playwright project runtime. It is like runtime context
+    // (Runtime context for execution in playwright)
+    meta:{
+        bot: bot,
+        patients: [patient],
+        config:{type: Schema.Types.Mixed, default:{}},
+        rv:{type: Schema.Types.Mixed, default:{}},
+        outputPath: {type:String},
+        logsPath: {type:String},
+        workers: {type:Number, default:1},
+        retries: {type:Number, default:0},
+        playwrightMode: {type:String, enum:['serial', 'default', 'parallel', undefined]},
+        headed:{type:Boolean, default:false},
+    }
 }, {
     timestamps: true,
     versionKey: false
 });
 
 ExecutionSchema.index(
-    { createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 90 } // ~90 days (3 months)
+    { createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 30 } // ~30 days (each month)
 );
 
 ExecutionSchema.index(

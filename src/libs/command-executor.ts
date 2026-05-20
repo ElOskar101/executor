@@ -2,7 +2,7 @@ import {spawn, ChildProcessByStdio} from "node:child_process";
 import path from "node:path";
 import {Readable} from "node:stream";
 import paths from "../configs/paths.config";
-import {modes} from "../types/execution.type";
+import {PlaywrightMode} from "../types/execution.type";
 
 /**
  * Validates that a project exists in the Playwright configuration
@@ -59,7 +59,7 @@ export type RunOptions = {
     workers: number;
     retries: number;
     headed: boolean;
-    mode: modes;
+    playwrightMode: PlaywrightMode;
     playwrightFolder: string;
     jobId: string;
 };
@@ -69,7 +69,7 @@ export function runPlaywrightProject({
                                          workers,
                                          retries,
                                          headed,
-                                         mode,
+                                         playwrightMode,
                                          jobId,
                                          playwrightFolder
                                      }: RunOptions): ChildProcessByStdio<null, Readable, Readable> {
@@ -86,7 +86,8 @@ export function runPlaywrightProject({
 
     const env = {
         ...process.env,
-        MODE: mode,
+        ENV: process.env.PLAYWRIGHT_ENV || "production",
+        RUN_ID: jobId,
         HTML_PATH:paths.reportPath(jobId),
         };
 

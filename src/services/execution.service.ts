@@ -33,16 +33,17 @@ export async function createExecution(payload: CreateExecutionRequest) {
         client: payload.client,
         clinic: payload.clinic,
         execution: payload.execution,
-        bot: payload.bot,
+        botName: payload.botName,
+        meta: payload.meta
     });
 
     const jobData: ExecutionJobData = {
         executionId: execution.id,
         project: payload.project,
-        mode: payload.mode,
-        workers: normalizePositiveInteger(payload.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 8)),
-        retries: normalizeRetries(payload.retries),
-        headed: Boolean(payload.headed),
+        playwrightMode: payload.meta.playwrightMode  || "default",
+        workers: normalizePositiveInteger(payload.meta.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10)),
+        retries: normalizeRetries(payload.meta.retries),
+        headed: Boolean(payload.meta.headed),
         playwrightFolder,
     };
 
@@ -89,9 +90,9 @@ export async function stopExecutionById(id: string) {
     const execution = await ExecutionModel.findById(id).lean();
     if (!execution) return null;
 
-    if (execution.jobId) {
+    if (execution.runId) {
         const queue = getExecutionQueue();
-        const job = await Job.fromId(queue, execution.jobId);
+        const job = await Job.fromId(queue, execution.runId);
 
         if (job) {
             const state = await job.getState();

@@ -6,9 +6,11 @@ import { setupSocketServer, closeSocketServer } from './services/socket-server.s
 import { closeExecutionQueue } from './queues/execution.queue';
 import { closeRealtimePublisher } from './services/realtime.service';
 
-const PORT = String(process.env.PORT) || 3000;
+const env = process.env.NODE_ENV || 'development';
+const PORT = env==='production' ? 3018 : String(process.env.PORT) || 3000;
 
-// Start DB and only start the HTTP server once DB connection is established.
+
+// Start DB and only start the HTTP server once DB connectionString is established.
 connectDb()
     .then(async () => {
       const server = app.listen(PORT, () => {

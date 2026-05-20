@@ -10,20 +10,13 @@ import {
     stopExecutionById
 } from "../services/execution.service";
 
-export const createExecutionRecord = async (payload: Execution) => {
-    try{
-        await ExecutionModel.create(payload);
-    }catch (e) {
-        throw e
-    }
-}
 
 export const createExecution = async (req: Request, res: Response) => {
     try {
         const payload = req.body as CreateExecutionRequest;
 
         if (!payload.project) {
-            return onBadRequest("project is required", res);
+            return onBadRequest("Project is required", res);
         }
 
         const execution = await createQueuedExecution(payload);

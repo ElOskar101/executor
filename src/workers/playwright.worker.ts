@@ -91,7 +91,7 @@ async function handleStopJob(job: Job<ExecutionJobData>) {
 }
 
 async function handleExecutionJob(job: Job<ExecutionJobData>) {
-    const { executionId, project, workers, retries, headed, playwrightFolder, playwrightMode } = job.data;
+    const { executionId, project, workers, retries, headed, playwrightFolder } = job.data;
     assertAllowedPlaywrightProject(project);
 
     console.info(
@@ -99,7 +99,7 @@ async function handleExecutionJob(job: Job<ExecutionJobData>) {
     );
 
     const logStream = createExecutionLogStream(executionId);
-    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: job.id || '1', playwrightMode });
+    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: job.id || '1' });
 
     activeProcesses.set(executionId, { child, stopping: false });
 
@@ -184,20 +184,11 @@ async function handleExecutionJob(job: Job<ExecutionJobData>) {
 
             const closeUpdate = error
                 ? {
-                    $set: {
-                        status,
-                        //error,
-                        finishedAt: new Date(),
-                    },
-                    $addToSet: {
-                        notes: error,
-                    },
+                    $set: {status,finishedAt: new Date()},
+                    $addToSet: { notes: error },
                 }
                 : {
-                    $set: {
-                        status,
-                        finishedAt: new Date(),
-                    },
+                    $set: {status, finishedAt: new Date()},
                 };
 
             await ExecutionModel.findByIdAndUpdate(executionId, closeUpdate);

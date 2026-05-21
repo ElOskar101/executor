@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import {connectDb} from "./connection.db";
 import app from './app';
 import { setupSocketServer, closeSocketServer } from './services/socket-server.service';
-import { closeExecutionQueue } from './queues/execution.queue';
+import {closeExecutionQueue, getExecutionQueueEvents} from './queues/execution.queue';
 import { closeRealtimePublisher } from './services/realtime.service';
 
 const env = process.env.NODE_ENV || 'development';

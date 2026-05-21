@@ -52,7 +52,6 @@ const ExecutionSchema = new Schema({
         logsPath: {type:String},
         workers: {type:Number, default:1},
         retries: {type:Number, default:0},
-        playwrightMode: {type:String, enum:['serial', 'default', 'parallel', undefined]},
         headed:{type:Boolean, default:false},
     }
 }, {

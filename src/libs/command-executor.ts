@@ -2,7 +2,6 @@ import {spawn, ChildProcessByStdio} from "node:child_process";
 import path from "node:path";
 import {Readable} from "node:stream";
 import paths from "../configs/paths.config";
-import {PlaywrightMode} from "../types/execution.type";
 
 /**
  * Validates that a project exists in the Playwright configuration
@@ -59,9 +58,9 @@ export type RunOptions = {
     workers: number;
     retries: number;
     headed: boolean;
-    playwrightMode: PlaywrightMode;
     playwrightFolder: string;
     jobId: string;
+    playwrightMode?: string;
 };
 
 export function runPlaywrightProject({
@@ -69,7 +68,6 @@ export function runPlaywrightProject({
                                          workers,
                                          retries,
                                          headed,
-                                         playwrightMode,
                                          jobId,
                                          playwrightFolder
                                      }: RunOptions): ChildProcessByStdio<null, Readable, Readable> {
@@ -91,10 +89,12 @@ export function runPlaywrightProject({
         HTML_PATH:paths.reportPath(jobId),
         };
 
-    return spawn("npx", args, {
+    const command = `npm run create-context && npx ${args.join(" ")}`;
+
+    return spawn("sh", ["-c", command], {
         cwd: playwrightFolder,
         env,
-        shell: false, // prevents shell injection
+        shell: false,
         stdio: ["ignore", "pipe", "pipe"],
     });
 }

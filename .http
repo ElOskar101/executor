@@ -22,6 +22,22 @@ content-type: application/json
       {
         "patientName": "Ana",
         "patientLastName": "Lopez",
+        "patientMemberId": "035351523",
+        "patientDob": "1985-03-10",
+        "policyHolderName": "Ana",
+        "policyHolderLastName": "Lopez",
+        "policyHolderDob": "1985-03-10",
+        "relationship": "self",
+        "zipCode": "90001",
+        "clinic": "Downtown Clinic",
+        "verificationType": "elg",
+        "filenames": "ana-lopez.pdf",
+        "otherInformation": {
+          "plan": "Gold"
+        }
+      },{
+        "patientName": "Ana",
+        "patientLastName": "Lopez",
         "patientMemberId": "A10001",
         "patientDob": "1985-03-10",
         "policyHolderName": "Ana",
@@ -42,8 +58,7 @@ content-type: application/json
     "outputPath": "/tmp/reports",
     "logsPath": "/tmp/logs",
     "workers": 2,
-    "retries": 1,
-    "playwrightMode": "parallel"
+    "retries": 1
   }
 }
 

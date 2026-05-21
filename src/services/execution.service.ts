@@ -40,7 +40,6 @@ export async function createExecution(payload: CreateExecutionRequest) {
     const jobData: ExecutionJobData = {
         executionId: execution.id,
         project: payload.project,
-        playwrightMode: payload.meta.playwrightMode  || "default",
         workers: normalizePositiveInteger(payload.meta.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10)),
         retries: normalizeRetries(payload.meta.retries),
         headed: Boolean(payload.meta.headed),

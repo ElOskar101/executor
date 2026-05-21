@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 
 export type ExecutionStatus = 'queued' | 'running' | 'completed' | 'unknown' | 'cancelled' | 'failed';
-export type PlaywrightMode = 'serial' | 'default' | 'parallel' | undefined;
 export type ExecutionType = 'elg' | 'fbd';
 
 interface Patient { // Patient that would be tested in playwright
@@ -45,7 +44,6 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
         workers?: number,
         retries?: number,
         headed?: boolean,
-        playwrightMode?: PlaywrightMode,
     };
 }
 
@@ -55,7 +53,6 @@ export interface ExecutionJobData {
     workers: number;
     retries: number;
     headed: boolean;
-    playwrightMode?: PlaywrightMode;
     playwrightFolder: string;
 }
 
@@ -85,7 +82,6 @@ export default interface Execution {
         logsPath?: string,
         workers?: number,
         retries?: number,
-        playwrightMode?: PlaywrightMode,
         headed?: boolean,
     }
 }

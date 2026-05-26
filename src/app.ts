@@ -9,11 +9,19 @@ import path from "path";
 
 const app = express();
 const reportsFolder = path.resolve(process.cwd(), 'reports');
+const reportsFrameAncestor = "https://agent.controlcentralcarrier.com";
 
 app.use(morgan('dev'));
 app.use(express.json());
 app.set('trust proxy', 1);
 app.use(helmet());
+
+app.use('/reports', (req: Request, res: Response, next: NextFunction) => {
+  // Allow framing only for reports and only from the trusted frontend origin.
+  res.removeHeader('X-Frame-Options');
+  res.setHeader('Content-Security-Policy', `frame-ancestors 'self' ${reportsFrameAncestor};`);
+  next();
+});
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/reports', express.static(reportsFolder));

@@ -4,7 +4,7 @@ import { getPlaywrightRootFolder, assertAllowedPlaywrightProject } from "../conf
 import { ExecutionModel } from "../models/execution.model";
 import { getExecutionQueue } from "../queues/execution.queue";
 import { CreateExecutionRequest, ExecutionJobData, ExecutionStatus } from "../types/execution.type";
-import { readExecutionLog } from "./log.service";
+import { readExecutionLog } from "../adapters/mongo.adapter";
 import { publishStopExecution } from "./realtime.service";
 
 const DEFAULT_WORKERS = 1;

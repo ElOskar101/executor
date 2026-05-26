@@ -35,7 +35,8 @@ content-type: application/json
         "otherInformation": {
           "plan": "Gold"
         }
-      },{
+      },
+      {
         "patientName": "Ana",
         "patientLastName": "Lopez",
         "patientMemberId": "A10001",
@@ -114,7 +115,5 @@ content-type: application/json
     "playwrightMode": "parallel" // (opcional)
   }
 }
-
-
 
 ###

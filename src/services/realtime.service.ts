@@ -1,33 +1,27 @@
-import { createRedisConnection, REDIS_CHANNELS } from "../configs/redis.config";
+import { REDIS_CHANNELS } from "../configs/redis.config";
+import { publishRealtimeEvent, closeRealtimeAdapter } from "../adapters/redis.adapter";
 import { ExecutionLogEvent, ExecutionStatusEvent } from "../types/realtime.type";
 
-let publisher: ReturnType<typeof createRedisConnection> | null = null;
-
-function getPublisher() {
-    if (!publisher) {
-        publisher = createRedisConnection();
-    }
-
-    return publisher;
-}
+/**
+ * Low-level realtime events publisher that delegates to the realtime adapter.
+ *
+ */
 
 export async function publishExecutionLog(event: ExecutionLogEvent) {
-    await getPublisher().publish(REDIS_CHANNELS.logs, JSON.stringify(event));
+    await publishRealtimeEvent(REDIS_CHANNELS.logs, event);
 }
-
 export async function publishExecutionStatus(event: ExecutionStatusEvent) {
-    await getPublisher().publish(REDIS_CHANNELS.status, JSON.stringify(event));
+    await publishRealtimeEvent(REDIS_CHANNELS.status, event);
 }
 
 export async function publishStopExecution(executionId: string) {
-    await getPublisher().publish(REDIS_CHANNELS.control, JSON.stringify({
+    await publishRealtimeEvent(REDIS_CHANNELS.control, {
         type: "stop-execution",
         executionId,
         timestamp: new Date().toISOString(),
-    }));
+    });
 }
 
 export async function closeRealtimePublisher() {
-    publisher?.disconnect();
-    publisher = null;
+    await closeRealtimeAdapter();
 }

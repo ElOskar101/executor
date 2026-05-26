@@ -3,7 +3,7 @@ import { Server as HttpServer } from "node:http";
 import { Server as SocketServer } from "socket.io";
 
 import { createRedisConnection, REDIS_CHANNELS } from "../configs/redis.config";
-import { readExecutionLog } from "./log.service";
+import { readExecutionLog } from "../adapters/mongo.adapter";
 
 let io: SocketServer | null = null;
 let subscriber: ReturnType<typeof createRedisConnection> | null = null;

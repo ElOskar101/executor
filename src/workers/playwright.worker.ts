@@ -58,6 +58,10 @@ function killProcessTree(child: ChildProcessByStdio<null, Readable, Readable>) {
     }, Number(process.env.STOP_KILL_GRACE_MS || 10000)).unref();
 }
 
+function formatPersistedLogChunk(stream: "stdout" | "stderr" | "system", message: string) {
+    return `[${new Date().toISOString()}] [${stream}] ${message}`;
+}
+
 async function stopLocalExecution(executionId: string) {
     const activeProcess = activeProcesses.get(executionId);
     if (!activeProcess) return false;
@@ -121,10 +125,16 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
         stream: "system",
         message: `Running: npx playwright test --project=${project} --workers=${workers} --retries=${retries}${headed ? " --headed" : ""}`,
     });
+    await logSink.append(
+        formatPersistedLogChunk(
+            "system",
+            `Running: npx playwright test --project=${project} --workers=${workers} --retries=${retries}${headed ? " --headed" : ""}\n`,
+        ),
+    );
 
     const writeOutput = async (stream: "stdout" | "stderr", data: Buffer) => {
         const message = data.toString();
-        await logSink.append(message);
+        await logSink.append(formatPersistedLogChunk(stream, message));
         await realtimeWriter.publishLog({
             stream,
             message,
@@ -142,7 +152,7 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
     return new Promise<void>((resolve, reject) => {
         child.on("error", async (error) => {
             activeProcesses.delete(executionId);
-            await logSink.append(`\n[system] ${error.message}\n`);
+            await logSink.append(formatPersistedLogChunk("system", `${error.message}\n`));
             await logSink.close();
             await eventWriter.markFailed(error.message);
             await realtimeWriter.publishStatus({
@@ -163,7 +173,9 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
             );
 
             activeProcesses.delete(executionId);
-            await logSink.append(`\n[system] Finished with status=${status} code=${code} signal=${signal || ""}\n`);
+            await logSink.append(
+                formatPersistedLogChunk("system", `Finished with status=${status} code=${code} signal=${signal || ""}\n`),
+            );
             await logSink.close();
 
             await eventWriter.markFinished({ status, note: error });

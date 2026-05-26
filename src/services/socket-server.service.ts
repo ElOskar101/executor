@@ -49,6 +49,7 @@ export async function setupSocketServer(server: HttpServer) {
 
         if (executionId) {
             io?.to(`execution:${executionId}`).emit(channel, payload);
+            return;
         }
 
         io?.emit(channel, payload);

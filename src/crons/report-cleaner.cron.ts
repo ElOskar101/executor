@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
 import cron from 'node-cron';
+import {createLogger} from '../libs/logger';
+const logger = createLogger('cron');
 
 type CleanupDeps = {
   readdir: typeof fs.readdir;
@@ -12,7 +13,6 @@ type CleanupDeps = {
 type CleanupOptions = {
   reportsFolder?: string;
   now?: Date;
-  logger?: Pick<typeof console, 'info' | 'warn' | 'error'>;
   deps?: CleanupDeps;
 };
 
@@ -64,7 +64,6 @@ async function getExpiredReportFolders(reportsFolder: string, cutoff: Date, deps
 export async function cleanupOldReports(options: CleanupOptions = {}) {
   const reportsFolder = options.reportsFolder || DEFAULT_REPORTS_FOLDER;
   const now = options.now || new Date();
-  const logger = options.logger || console;
   const deps = options.deps || fs;
   const cutoff = getOneMonthAgo(now);
 
@@ -72,23 +71,23 @@ export async function cleanupOldReports(options: CleanupOptions = {}) {
 	const expiredFolders = await getExpiredReportFolders(reportsFolder, cutoff, deps);
 
 	if (expiredFolders.length === 0) {
-	  logger.info(`[CRON] No report folders older than ${cutoff.toISOString()} were found.`);
+	  logger.info(`No report folders older than ${cutoff.toISOString()} were found.`);
 	  return { deletedCount: 0, cutoff };
 	}
 
 	for (const reportFolder of expiredFolders) {
 	  await deps.rm(reportFolder, { recursive: true, force: true });
-	  logger.info(`[CRON] Deleted expired report folder: ${reportFolder}`);
+	  logger.info(`Deleted expired report folder: ${reportFolder}`);
 	}
 
 	return { deletedCount: expiredFolders.length, cutoff };
   } catch (error) {
     if (error && typeof error === 'object' && 'code' in error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
-      logger.info(`[CRON] Reports folder not found at ${reportsFolder}. Skipping cleanup.`);
+      logger.info(`Reports folder not found at ${reportsFolder}. Skipping cleanup.`);
       return { deletedCount: 0, cutoff };
     }
 
-	logger.error('[CRON] Failed to clean old report folders', error);
+	logger.error('Failed to clean old report folders', {error});
 	throw error;
   }
 }
@@ -99,14 +98,13 @@ export async function cleanupOldReports(options: CleanupOptions = {}) {
  */
 export function startReportCleanupCron(options: CleanupOptions = {}) {
   const reportsFolder = options.reportsFolder || DEFAULT_REPORTS_FOLDER;
-  const logger = options.logger || console;
 
-  logger.info(`[CRON] Starting report cleanup cron for ${reportsFolder}`);
+  logger.info(`Starting report cleanup cron for ${reportsFolder}`);
   const task = cron.schedule(MONTHLY_CLEANUP_CRON, () => {
-	void cleanupOldReports({ reportsFolder, logger, deps: options.deps, now: new Date() });
+	void cleanupOldReports({ reportsFolder, deps: options.deps, now: new Date() });
   });
 
-  logger.info(`[CRON] Report cleanup scheduled with pattern "${MONTHLY_CLEANUP_CRON}" for ${reportsFolder}`);
+  logger.info(`Report cleanup scheduled with pattern "${MONTHLY_CLEANUP_CRON}"`);
 
   return task;
 }

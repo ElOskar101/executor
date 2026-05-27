@@ -1,12 +1,12 @@
-import { Job } from "bullmq";
+import {Job} from "bullmq";
 
-import { getPlaywrightRootFolder, assertAllowedPlaywrightProject } from "../configs/playwright.config";
-import { ExecutionModel } from "../models/execution.model";
-import { getExecutionQueue } from "../queues/execution.queue";
-import { CreateExecutionRequest, ExecutionJobData, ExecutionStatus } from "../types/execution.type";
-import { readExecutionLog } from "../adapters/mongo.adapter";
-import { publishPauseExecution, publishResumeExecution, publishStopExecution } from "./realtime.service";
-import { createLogger } from "../libs/logger";
+import {assertAllowedPlaywrightProject, getPlaywrightRootFolder} from "../configs/playwright.config";
+import {ExecutionModel} from "../models/execution.model";
+import {getExecutionQueue} from "../queues/execution.queue";
+import {CreateExecutionRequest, ExecutionJobData, ExecutionStatus} from "../types/execution.type";
+import {readExecutionLog} from "../adapters/mongo.adapter";
+import {publishPauseExecution, publishResumeExecution, publishStopExecution} from "./realtime.service";
+import {createLogger} from "../libs/logger";
 
 const DEFAULT_WORKERS = 1;
 const DEFAULT_RETRIES = 0;
@@ -57,16 +57,14 @@ export async function createExecution(payload: CreateExecutionRequest) {
         `Enqueued job=${job.id} executionId=${execution.id} project=${payload.project} workers=${jobData.workers} retries=${jobData.retries} headed=${jobData.headed}`,
     );
 
-    const updatedExecution = await ExecutionModel.findByIdAndUpdate(
+    return ExecutionModel.findByIdAndUpdate(
         execution.id,
         {
             jobId: job.id,
             playwrightExecutionId: job.id,
         },
-        { new: true },
+        {new: true},
     ).lean();
-
-    return updatedExecution;
 }
 
 export async function listExecutions() {

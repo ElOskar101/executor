@@ -35,11 +35,6 @@ test('cleanupOldReports deletes only report folders older than one month', async
         deletedPaths.push(String(targetPath));
       },
     },
-    logger: {
-      info: () => undefined,
-      warn: () => undefined,
-      error: () => undefined,
-    },
   });
 
   assert.equal(result.deletedCount, 1);
@@ -59,11 +54,6 @@ test('cleanupOldReports skips missing reports folder', async () => {
         throw new Error('stat should not be called');
       },
       rm: async () => undefined,
-    },
-    logger: {
-      info: () => undefined,
-      warn: () => undefined,
-      error: () => undefined,
     },
   });
 

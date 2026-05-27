@@ -22,10 +22,17 @@ import { createExecutionRealtimeWriter } from "../services/execution-realtime-wr
 // They can be called from BullMQ workers, HTTP handlers, CLI scripts, etc.
 // ---------------------------------------------------------------------------
 
+/** Maximum time (ms) a process can remain paused before the system cancels it. Default: 1 hour. */
+const MAX_PAUSE_DURATION_MS = Number(process.env.MAX_PAUSE_DURATION_MS || 60 * 60 * 1000);
+
 type ActiveProcess = {
     child: ChildProcessByStdio<null, Readable, Readable>;
     stopping: boolean;
     paused: boolean;
+    /** Reason set when the system (not the user) cancels the process (e.g. max pause exceeded). Persisted as a note. */
+    cancelReason?: string;
+    /** Timer that auto-cancels the process if it stays paused longer than MAX_PAUSE_DURATION_MS */
+    pauseTimer?: ReturnType<typeof setTimeout>;
 };
 
 const activeProcesses = new Map<string, ActiveProcess>();
@@ -64,21 +71,25 @@ function formatPersistedLogChunk(stream: "stdout" | "stderr" | "system", message
     return `[${new Date().toISOString()}] [${stream}] ${message}`;
 }
 
-async function stopLocalExecution(executionId: string) {
+async function stopLocalExecution(executionId: string, reason?: string) {
     const activeProcess = activeProcesses.get(executionId);
     if (!activeProcess) return false;
     const realtimeWriter = createExecutionRealtimeWriter({ executionId });
 
+    // Clear any pending pause timeout so it doesn't fire after stop
+    if (activeProcess.pauseTimer) {
+        clearTimeout(activeProcess.pauseTimer);
+        activeProcess.pauseTimer = undefined;
+    }
+
     activeProcess.stopping = true;
-    console.info(`[WORKER] Stop requested for executionId=${executionId}`);
-    await realtimeWriter.publishLog({
-        stream: "system",
-        message: "Stop requested. Sending SIGTERM to Playwright process.",
-    });
+    if (reason) activeProcess.cancelReason = reason;
+    const message = reason ?? "Stop requested. Sending SIGTERM to Playwright process.";
+    console.info(`[WORKER] Stop requested for executionId=${executionId}${reason ? ` reason="${reason}"` : ""}`);
+    await realtimeWriter.publishLog({ stream: "system", message });
     killProcessTree(activeProcess.child);
     return true;
 }
-
 
 async function pauseLocalExecution(executionId: string) {
     const activeProcess = activeProcesses.get(executionId);
@@ -89,6 +100,16 @@ async function pauseLocalExecution(executionId: string) {
     if (!paused) return false;
 
     activeProcess.paused = true;
+
+    // Auto-cancel if paused longer than MAX_PAUSE_DURATION_MS
+    activeProcess.pauseTimer = setTimeout(() => {
+        console.warn(`[WORKER] executionId=${executionId} exceeded max pause duration (${MAX_PAUSE_DURATION_MS}ms). Cancelling.`);
+        void stopLocalExecution(
+            executionId,
+            `Execution cancelled by system: paused for more than ${MAX_PAUSE_DURATION_MS / 1000}s without being resumed.`,
+        );
+    }, MAX_PAUSE_DURATION_MS).unref();
+
     await realtimeWriter.publishLog({
         stream: "system",
         message: "Pause requested. Sending SIGSTOP to Playwright process.",
@@ -109,6 +130,13 @@ async function resumeLocalExecution(executionId: string) {
     if (!resumed) return false;
 
     activeProcess.paused = false;
+
+    // Clear the auto-cancel timer since the process is running again
+    if (activeProcess.pauseTimer) {
+        clearTimeout(activeProcess.pauseTimer);
+        activeProcess.pauseTimer = undefined;
+    }
+
     await realtimeWriter.publishLog({
         stream: "system",
         message: "Resume requested. Sending SIGCONT to Playwright process.",
@@ -205,7 +233,9 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
             const activeProcess = activeProcesses.get(executionId);
             const cancelled = activeProcess?.stopping || signal === "SIGTERM" || signal === "SIGKILL";
             const status: ExecutionStatus = cancelled ? "cancelled" : code === 0 ? "completed" : "failed";
-            const error = status === "failed" ? `Playwright exited with code ${code}` : undefined;
+            const error = status === "failed"
+                ? `Playwright exited with code ${code}`
+                : activeProcess?.cancelReason; // system-cancel note (e.g. max pause exceeded)
 
             console.info(
                 `[WORKER] Finished job=${resolvedJobId} executionId=${executionId} status=${status} code=${code} signal=${signal || ""}`,
@@ -259,7 +289,7 @@ async function startBullMQTransport() {
     // (separate from BullMQ's own Redis connection)
     const controlSubscriber = createRedisConnection();
     await controlSubscriber.subscribe(REDIS_CHANNELS.control);
-    controlSubscriber.on("message", (_channel, message) => {
+    controlSubscriber.on("message", (_channel, message) => {// For instant requests
         try {
             const payload = JSON.parse(message) as { type?: string; executionId?: string };
             if (!payload.executionId) return;
@@ -282,10 +312,9 @@ async function startBullMQTransport() {
         }
     });
 
-    const worker = new Worker<ExecutionJobData>(
+    const worker = new Worker<ExecutionJobData>( // For queued jobs
         EXECUTION_QUEUE_NAME,
         async (job) => {
-
             // Bridge: BullMQ job → core execution logic
             await handleExecutionJob({ ...job.data, jobId: String(job.id || "1") });
         },
@@ -329,7 +358,7 @@ async function main() {
 
     const shutdown = async (signal: string) => {
         console.info(`[WORKER] Received ${signal}. Stopping active executions...`);
-        await Promise.all([...activeProcesses.keys()].map(stopLocalExecution));
+        await Promise.all([...activeProcesses.keys()].map((id) => stopLocalExecution(id)));
         await transport.close();
         await infra.disconnect();
         process.exit(0);

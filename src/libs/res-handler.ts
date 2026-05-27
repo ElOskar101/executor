@@ -2,6 +2,9 @@ import { Response } from "express";
 
 import httpCodes from "../configs/codes-config";
 import { currentDateFormatted } from "./dates";
+import { createLogger } from "./logger";
+
+const logger = createLogger("system");
 
 type MessageResponse = {
     message: string;
@@ -46,12 +49,11 @@ const normalizeError = (error: unknown): ErrorLike => {
 export const onError = (error: unknown, file: string, functionName: string, res: Response): Response => {
     const { message = "Unknown error", stack = "" } = normalizeError(error);
     const location = stack.split("\n")[1]?.trim() ?? "No stack trace available";
-    console.error(`${message} | ${file}.ts > ${functionName}(); | ${currentDateFormatted()} \n ${location} `);
+    logger.error(`${message} | ${file}.ts > ${functionName}(); | ${currentDateFormatted()} | ${location}`);
     return res.status(httpCodes.INTERNAL_SERVER_ERROR_N).send(error);
 }
 
 export const onNotFound = (message: string, res: Response<MessageResponse>): Response<MessageResponse> => {
-    //if (!message.toLowerCase().includes('profile picture')) console.error(message);
     return res.status(httpCodes.NOT_FOUND).send({ message: message });
 }
 
@@ -68,22 +70,22 @@ export const onSendFile = (data: string, res: Response): void => {
 }
 
 export const onBadRequest = (message: string, res: Response<MessageResponse>): Response<MessageResponse> => {
-    console.error(message);
+    logger.warn(message);
     return res.status(httpCodes.BAD_REQUEST).send({ message: message });
 }
 
 export const onUnauthorized = (message: string, res: Response<MessageResponse>): Response<MessageResponse> => {
-    console.error(message);
+    logger.warn(message);
     return res.status(httpCodes.UNAUTHORIZED).send({ message: message });
 }
 
 export const onNotAllowed = (message: string, res: Response<MessageResponse>): Response<MessageResponse> => {
-    console.error(message);
+    logger.warn(message);
     return res.status(httpCodes.NOT_ALLOWED).send({ message: message });
 }
 
 export const onNotModify = (message: string, res: Response<MessageResponse>): Response<MessageResponse> => {
-    console.error(message);
+    logger.warn(message);
     return res.status(httpCodes.NOT_MODIFIED).send({ message: message });
 }
 

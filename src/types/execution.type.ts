@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export type ExecutionStatus = 'queued' | 'running' | 'completed' | 'unknown' | 'cancelled' | 'failed';
+export type ExecutionStatus = 'queued' | 'running' | 'paused' | 'completed' | 'unknown' | 'cancelled' | 'failed';
 export type ExecutionType = 'elg' | 'fbd';
 
 interface Patient { // Patient that would be tested in playwright

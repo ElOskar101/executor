@@ -31,7 +31,7 @@ const ExecutionSchema = new Schema({
     // Execution properties only for record keeping (creation, update, runtime jobs)
     runId: String,
     playwrightProject: String,
-    status: {type:String, required:true, enum:['queued', 'running', 'completed', 'unknown', 'cancelled', 'failed']},
+    status: {type:String, required:true, enum:['queued', 'running', 'paused', 'completed', 'unknown', 'cancelled', 'failed']},
     startedAt: Date,
     finishedAt: Date,
     notes: [String],

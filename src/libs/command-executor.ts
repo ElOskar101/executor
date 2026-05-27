@@ -43,15 +43,6 @@ export const validateProjectExists = async (projectName: string, playwrightFolde
 };
 */
 
-export const stopPlaywrightExecution = async (serviceId: string) => {
-    return spawn("kill", ["-TERM", serviceId], { shell: false, stdio: "inherit" });
-};
-
-export const getPlaywrightExecutions = async () => {
-
-}
-
-
 
 export type RunOptions = {
     project: string;
@@ -95,6 +86,7 @@ export function runPlaywrightProject({
         cwd: playwrightFolder,
         env,
         shell: false,
+        detached: true,
         stdio: ["ignore", "pipe", "pipe"],
     });
 }

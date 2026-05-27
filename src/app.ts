@@ -6,10 +6,12 @@ import helmet from 'helmet';
 import routes from './routes';
 import swaggerSpec from './docs/swagger';
 import path from "path";
+import { createLogger } from './libs/logger';
 
 const app = express();
 const reportsFolder = path.resolve(process.cwd(), 'reports');
 const reportsFrameAncestor = "https://agent.controlcentralcarrier.com";
+const logger = createLogger('app');
 
 app.use(morgan('dev'));
 app.use(express.json());
@@ -34,9 +36,9 @@ app.use(async (req: Request, res: Response) => {
 });
 
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   // Basic centralized error handler for unexpected exceptions.
-  console.error(`[SERVER] ${err}`);
+  logger.error('Unhandled application error', { error: err });
   res.status(500).json({
     message: 'Internal server error'
   });

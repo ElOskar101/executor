@@ -1,7 +1,8 @@
-//import {i} from "./libs/logger";
-
 import mongoose from 'mongoose';
 require('dotenv').config();
+import { createLogger } from './libs/logger';
+
+const logger = createLogger('db');
 
 /**
  * Connect to MongoDB and return the connection promise.
@@ -10,9 +11,9 @@ require('dotenv').config();
 export const connectDb = async () => {
     try {
         await mongoose.connect(String(process.env.MONGODB_URI), {});
-        console.info("[SERVER] Success connection to the database");
+        logger.info('Success connection to the database');
     } catch (t) {
-        console.info('[SERVER] Database connection failed');
+        logger.error('Database connection failed', { error: t });
         throw t; // rethrow so callers can handle startup failure
     }
 }

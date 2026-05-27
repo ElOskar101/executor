@@ -5,10 +5,12 @@ import { ExecutionModel } from "../models/execution.model";
 import { getExecutionQueue } from "../queues/execution.queue";
 import { CreateExecutionRequest, ExecutionJobData, ExecutionStatus } from "../types/execution.type";
 import { readExecutionLog } from "../adapters/mongo.adapter";
-import { publishStopExecution } from "./realtime.service";
+import { publishPauseExecution, publishResumeExecution, publishStopExecution } from "./realtime.service";
+import { createLogger } from "../libs/logger";
 
 const DEFAULT_WORKERS = 1;
 const DEFAULT_RETRIES = 0;
+const logger = createLogger("system");
 
 function normalizePositiveInteger(value: unknown, fallback: number, max: number) {
     const numberValue = Number(value);
@@ -51,8 +53,8 @@ export async function createExecution(payload: CreateExecutionRequest) {
         jobId: execution.id,
     });
 
-    console.info(
-        `[QUEUE] Enqueued job=${job.id} executionId=${execution.id} project=${payload.project} workers=${jobData.workers} retries=${jobData.retries} headed=${jobData.headed}`,
+    logger.info(
+        `Enqueued job=${job.id} executionId=${execution.id} project=${payload.project} workers=${jobData.workers} retries=${jobData.retries} headed=${jobData.headed}`,
     );
 
     const updatedExecution = await ExecutionModel.findByIdAndUpdate(
@@ -104,18 +106,6 @@ export async function stopExecutionById(id: string) {
 
     await publishStopExecution(id);
 
-    await getExecutionQueue().add("stop-playwright-project", {
-        executionId: id,
-        project: execution.playwrightProject || "",
-        workers: 1,
-        retries: 0,
-        headed: false,
-        playwrightFolder: getPlaywrightRootFolder(),
-    }, {
-        jobId: `stop:${id}:${Date.now()}`,
-        attempts: 1,
-    });
-
     return ExecutionModel.findByIdAndUpdate(
         id,
         {
@@ -125,3 +115,34 @@ export async function stopExecutionById(id: string) {
         { new: true },
     ).lean();
 }
+
+export async function pauseExecutionById(id: string) {
+    const execution = await ExecutionModel.findById(id).lean();
+    if (!execution) return null;
+
+    await publishPauseExecution(id);
+
+    return ExecutionModel.findByIdAndUpdate(
+        id,
+        {
+            status: "paused" satisfies ExecutionStatus,
+        },
+        { new: true },
+    ).lean();
+}
+
+export async function resumeExecutionById(id: string) {
+    const execution = await ExecutionModel.findById(id).lean();
+    if (!execution) return null;
+
+    await publishResumeExecution(id);
+
+    return ExecutionModel.findByIdAndUpdate(
+        id,
+        {
+            status: "running" satisfies ExecutionStatus,
+        },
+        { new: true },
+    ).lean();
+}
+

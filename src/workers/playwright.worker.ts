@@ -5,7 +5,7 @@ import os from "node:os";
 import { Readable } from "node:stream";
 
 import mongoose from "mongoose";
-import { Job, Worker } from "bullmq";
+import { Worker } from "bullmq";
 
 import { connectDb } from "../connection.db";
 import { REDIS_CHANNELS, createRedisConnection, EXECUTION_QUEUE_NAME, redisConnectionOptions } from "../configs/redis.config";
@@ -25,36 +25,38 @@ import { createExecutionRealtimeWriter } from "../services/execution-realtime-wr
 type ActiveProcess = {
     child: ChildProcessByStdio<null, Readable, Readable>;
     stopping: boolean;
+    paused: boolean;
 };
 
 const activeProcesses = new Map<string, ActiveProcess>();
 const workerId = process.env.WORKER_ID || `${os.hostname() || "worker"}:${process.pid}`;
 
+function sendSignal(child: ChildProcessByStdio<null, Readable, Readable>, signal: NodeJS.Signals) {
+    if (!child.pid) return false;
+
+    try {
+        process.kill(-child.pid, signal);
+        return true;
+    } catch {
+        try {
+            process.kill(child.pid, signal);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+}
+
 function killProcessTree(child: ChildProcessByStdio<null, Readable, Readable>) {
     if (!child.pid) return;
 
-    try {
-        process.kill(-child.pid, "SIGTERM");
-    } catch {
-        try {
-            process.kill(child.pid, "SIGTERM");
-        } catch {
-            return;
-        }
-    }
+    const terminated = sendSignal(child, "SIGTERM");
+    if (!terminated) return;
 
     setTimeout(() => {
         if (child.killed) return;
 
-        try {
-            process.kill(-child.pid!, "SIGKILL");
-        } catch {
-            try {
-                process.kill(child.pid!, "SIGKILL");
-            } catch {
-                // Process already exited.
-            }
-        }
+        sendSignal(child, "SIGKILL");
     }, Number(process.env.STOP_KILL_GRACE_MS || 10000)).unref();
 }
 
@@ -77,6 +79,47 @@ async function stopLocalExecution(executionId: string) {
     return true;
 }
 
+
+async function pauseLocalExecution(executionId: string) {
+    const activeProcess = activeProcesses.get(executionId);
+    if (!activeProcess || activeProcess.stopping || activeProcess.paused) return false;
+    const realtimeWriter = createExecutionRealtimeWriter({ executionId });
+
+    const paused = sendSignal(activeProcess.child, "SIGSTOP");
+    if (!paused) return false;
+
+    activeProcess.paused = true;
+    await realtimeWriter.publishLog({
+        stream: "system",
+        message: "Pause requested. Sending SIGSTOP to Playwright process.",
+    });
+    await realtimeWriter.publishStatus({
+        status: "paused",
+        pid: activeProcess.child.pid,
+    });
+    return true;
+}
+
+async function resumeLocalExecution(executionId: string) {
+    const activeProcess = activeProcesses.get(executionId);
+    if (!activeProcess || activeProcess.stopping || !activeProcess.paused) return false;
+    const realtimeWriter = createExecutionRealtimeWriter({ executionId });
+
+    const resumed = sendSignal(activeProcess.child, "SIGCONT");
+    if (!resumed) return false;
+
+    activeProcess.paused = false;
+    await realtimeWriter.publishLog({
+        stream: "system",
+        message: "Resume requested. Sending SIGCONT to Playwright process.",
+    });
+    await realtimeWriter.publishStatus({
+        status: "running",
+        pid: activeProcess.child.pid,
+    });
+    return true;
+}
+
 // ---------------------------------------------------------------------------
 // Public API — callable from any transport (BullMQ, HTTP, CLI, IPC, etc.)
 // ---------------------------------------------------------------------------
@@ -93,10 +136,6 @@ export async function runExecution(data: ExecutionJobData & { jobId?: string }):
 // Internal handlers
 // ---------------------------------------------------------------------------
 
-async function handleStopJob(job: Job<ExecutionJobData>) {
-    await stopLocalExecution(job.data.executionId);
-}
-
 async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
     const { executionId, project, workers, retries, headed, playwrightFolder, jobId } = data;
     assertAllowedPlaywrightProject(project);
@@ -112,7 +151,7 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
     const realtimeWriter = createExecutionRealtimeWriter({ executionId, jobId: resolvedJobId });
     const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: resolvedJobId });
 
-    activeProcesses.set(executionId, { child, stopping: false });
+    activeProcesses.set(executionId, { child, stopping: false, paused: false });
 
     await eventWriter.markRunning({ pid: child.pid, jobId: resolvedJobId });
 
@@ -223,8 +262,20 @@ async function startBullMQTransport() {
     controlSubscriber.on("message", (_channel, message) => {
         try {
             const payload = JSON.parse(message) as { type?: string; executionId?: string };
-            if (payload.type === "stop-execution" && payload.executionId) {
+            if (!payload.executionId) return;
+
+            if (payload.type === "stop-execution") {
                 void stopLocalExecution(payload.executionId);
+                return;
+            }
+
+            if (payload.type === "pause-execution") {
+                void pauseLocalExecution(payload.executionId);
+                return;
+            }
+
+            if (payload.type === "resume-execution") {
+                void resumeLocalExecution(payload.executionId);
             }
         } catch (error) {
             console.error("[WORKER] Invalid control message", error);
@@ -234,10 +285,6 @@ async function startBullMQTransport() {
     const worker = new Worker<ExecutionJobData>(
         EXECUTION_QUEUE_NAME,
         async (job) => {
-            if (job.name === "stop-playwright-project") {
-                await handleStopJob(job);
-                return;
-            }
 
             // Bridge: BullMQ job → core execution logic
             await handleExecutionJob({ ...job.data, jobId: String(job.id || "1") });

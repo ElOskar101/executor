@@ -5,6 +5,8 @@ import {
     deleteExecution,
     getExecution,
     getExecutions,
+    pauseExecution,
+    resumeExecution,
     stopExecution,
     updateExecution
 } from '../controllers/execution.controller';
@@ -157,7 +159,7 @@ const router = express.Router();
  *           example: 682ba2f2d2930c4fd5e984c4
  *         status:
  *           type: string
- *           enum: [queued, running, completed, unknown, cancelled, failed]
+ *           enum: [queued, running, paused, completed, unknown, cancelled, failed]
  *         playwrightProject:
  *           type: string
  *         createdBy:
@@ -347,6 +349,74 @@ router.get('/executions/:id', getExecution);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/executions/:id/stop', stopExecution);
+
+/**
+ * @openapi
+ * /api/v1/executions/{id}/pause:
+ *   post:
+ *     tags: [Executions]
+ *     summary: Pause a running execution
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Pause requested and execution updated to paused
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Execution'
+ *       400:
+ *         description: Execution is not in running state
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Execution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.post('/executions/:id/pause', pauseExecution);
+
+/**
+ * @openapi
+ * /api/v1/executions/{id}/resume:
+ *   post:
+ *     tags: [Executions]
+ *     summary: Resume a paused execution
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Resume requested and execution updated to running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Execution'
+ *       400:
+ *         description: Execution is not in paused state
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Execution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.post('/executions/:id/resume', resumeExecution);
 router.patch('/executions/:id', updateExecution);
 router.delete('/executions/:id', deleteExecution);
 

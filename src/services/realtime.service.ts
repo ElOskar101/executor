@@ -22,6 +22,22 @@ export async function publishStopExecution(executionId: string) {
     });
 }
 
+export async function publishPauseExecution(executionId: string) {
+    await publishRealtimeEvent(REDIS_CHANNELS.control, {
+        type: "pause-execution",
+        executionId,
+        timestamp: new Date().toISOString(),
+    });
+}
+
+export async function publishResumeExecution(executionId: string) {
+    await publishRealtimeEvent(REDIS_CHANNELS.control, {
+        type: "resume-execution",
+        executionId,
+        timestamp: new Date().toISOString(),
+    });
+}
+
 export async function closeRealtimePublisher() {
     await closeRealtimeAdapter();
 }

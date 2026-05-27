@@ -7,9 +7,13 @@ import {
     getExecutionById,
     getExecutionWithLogs,
     listExecutions,
+    pauseExecutionById,
+    resumeExecutionById,
     stopExecutionById
 } from "../services/execution.service";
+import { createLogger } from "../libs/logger";
 
+const logger = createLogger("system");
 
 export const createExecution = async (req: Request, res: Response) => {
     try {
@@ -18,7 +22,9 @@ export const createExecution = async (req: Request, res: Response) => {
         if (!payload.project) {
             return onBadRequest("Project is required", res);
         }
-
+        logger.info(
+            `User requested execution for project=${payload.project} patients=${payload.meta.patients.length}`,
+        );
         const execution = await createQueuedExecution(payload);
         onSuccess(execution, res);
     } catch (e) {
@@ -71,6 +77,46 @@ export const stopExecution = async (req: Request, res: Response) => {
         onSuccess(stoppedExecution, res);
     } catch (e) {
         onError(e, __filename, "stopExecution", res);
+    }
+}
+
+export const pauseExecution = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const execution = await getExecutionById(id);
+
+        if (!execution) {
+            return onNotFound("Execution not found", res);
+        }
+
+        if (execution.status !== "running") {
+            return onBadRequest(`Execution cannot be paused while status is ${execution.status}`, res);
+        }
+
+        const pausedExecution = await pauseExecutionById(id);
+        onSuccess(pausedExecution, res);
+    } catch (e) {
+        onError(e, __filename, "pauseExecution", res);
+    }
+}
+
+export const resumeExecution = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const execution = await getExecutionById(id);
+
+        if (!execution) {
+            return onNotFound("Execution not found", res);
+        }
+
+        if (execution.status !== "paused") {
+            return onBadRequest(`Execution cannot be resumed while status is ${execution.status}`, res);
+        }
+
+        const resumedExecution = await resumeExecutionById(id);
+        onSuccess(resumedExecution, res);
+    } catch (e) {
+        onError(e, __filename, "resumeExecution", res);
     }
 }
 

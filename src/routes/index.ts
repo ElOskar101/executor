@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 
 import executionRoute from './execution.route';
+import { createLogger } from '../libs/logger';
 
 const router = express.Router();
+const logger = createLogger('routes');
 
 router.get('/', (req: Request, res: Response) => {
   res.status(200).json({
@@ -20,5 +22,5 @@ router.get('/api/health', (req: Request, res: Response) => {
 
 router.use('/api/v1', executionRoute);
 router.use('/', executionRoute);
-console.info("[SERVER] Routes loaded");
+logger.info('Routes loaded');
 export default router;

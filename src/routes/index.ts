@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 
 import executionRoute from './execution.route';
+import statsRoute from './stats.route';
 import { createLogger } from '../libs/logger';
 
 const router = express.Router();
@@ -20,6 +21,8 @@ router.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
+router.use('/api/v1', statsRoute);
+router.use('/', statsRoute);
 router.use('/api/v1', executionRoute);
 router.use('/', executionRoute);
 logger.info('Routes loaded');

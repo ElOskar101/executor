@@ -165,7 +165,7 @@ export async function runExecution(data: ExecutionJobData & { jobId?: string }):
 // ---------------------------------------------------------------------------
 
 async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
-    const { executionId, project, workers, retries, headed, playwrightFolder, jobId } = data;
+    const { executionId, project, workers, retries, headed, playwrightFolder, meta, jobId } = data;
     assertAllowedPlaywrightProject(project);
 
     const resolvedJobId = String(jobId || "direct");
@@ -177,7 +177,15 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
     const logSink = createExecutionLogSink(executionId); // Playwright process stdout/stderr
     const eventWriter = createExecutionEventWriter(executionId); // Execution state fallowing up (running, failed, canceled)
     const realtimeWriter = createExecutionRealtimeWriter({ executionId, jobId: resolvedJobId });
-    const child = runPlaywrightProject({ project, workers, retries, headed, playwrightFolder, jobId: resolvedJobId });
+    const child = runPlaywrightProject({
+        project,
+        workers,
+        retries,
+        headed,
+        meta,
+        playwrightFolder,
+        jobId: resolvedJobId,
+    });
 
     activeProcesses.set(executionId, { child, stopping: false, paused: false });
 

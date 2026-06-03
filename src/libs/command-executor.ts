@@ -2,6 +2,7 @@ import {spawn, ChildProcessByStdio} from "node:child_process";
 import path from "node:path";
 import {Readable} from "node:stream";
 import paths from "../configs/paths.config";
+import {type Meta} from "../types/execution.type";
 
 /**
  * Validates that a project exists in the Playwright configuration
@@ -51,6 +52,7 @@ export type RunOptions = {
     headed: boolean;
     playwrightFolder: string;
     jobId: string;
+    meta: Meta
     playwrightMode?: string;
 };
 
@@ -60,6 +62,7 @@ export function runPlaywrightProject({
                                          retries,
                                          headed,
                                          jobId,
+                                         meta,
                                          playwrightFolder
                                      }: RunOptions): ChildProcessByStdio<null, Readable, Readable> {
     const safeWorkers = Math.max(1, Math.min(Number(workers) || 1, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 8)));
@@ -77,6 +80,7 @@ export function runPlaywrightProject({
         ...process.env,
         ENV: process.env.PLAYWRIGHT_ENV || "production",
         RUN_ID: jobId,
+        META: JSON.stringify(meta),
         HTML_PATH:paths.reportPath(jobId),
         };
 

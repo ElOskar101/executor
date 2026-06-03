@@ -12,8 +12,9 @@ import {
     stopExecutionById
 } from "../services/execution.service";
 import { createLogger } from "../libs/logger";
+import {createQuery} from "../libs/query-builder";
 
-const logger = createLogger("system");
+const logger = createLogger("api");
 
 export const createExecution = async (req: Request, res: Response) => {
     try {
@@ -38,7 +39,9 @@ export const createExecution = async (req: Request, res: Response) => {
 
 export const getExecutions = async (req:Request, res:Response) => {
     try{
-        const executions = await listExecutions() as Execution[];
+        const query = await createQuery(req.query);
+        logger.info(`Query executions: ${JSON.stringify(query)}`);
+        const executions = await listExecutions(query) as Execution[];
         onSuccess(executions, res);
     }catch (e) {
         onError(e, __filename, "getExecutions", res);

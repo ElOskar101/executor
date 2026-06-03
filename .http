@@ -64,7 +64,7 @@ content-type: application/json
 }
 
 ### GET request to example server
-GET http://localhost:3018/api/v1/executions/6a04f44f3193a3f489ddb3a8
+GET http://localhost:3017/api/v1/executions
 content-type: application/json
 
 ### GET request to example server

@@ -4,6 +4,7 @@ export type ExecutionStatus = 'queued' | 'running' | 'paused' | 'completed' | 'u
 export type ExecutionType = 'elg' | 'fbd';
 
 interface Patient { // Patient that would be tested in playwright
+    id?: string
     patientName: string,
     patientLastName: string,
     patientMemberId: string,
@@ -34,17 +35,7 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     clinic?: string;
     execution?: string;
     botName?: string;
-    meta: {
-        bot: Bot,
-        patients: Array<Patient>,
-        config: Record<string, unknown>
-        rv: Record<string, unknown>
-        outputPath?: string,
-        logsPath?: string,
-        workers?: number,
-        retries?: number,
-        headed?: boolean,
-    };
+    meta: Meta;
 }
 
 export interface ExecutionJobData {
@@ -54,6 +45,19 @@ export interface ExecutionJobData {
     retries: number;
     headed: boolean;
     playwrightFolder: string;
+    meta: Meta;
+}
+
+export interface Meta {
+    bot: Bot,
+    patients: Array<Patient>,
+    config: Record<string, unknown>
+    rv: Record<string, unknown>
+    outputPath?: string,
+    logsPath?: string,
+    workers?: number,
+    retries?: number,
+    headed?: boolean,
 }
 
 export default interface Execution {
@@ -73,15 +77,5 @@ export default interface Execution {
     botName: string,
     // Playwright execution properties needed for playwright project runtime. It is like runtime context
     // (Runtime context for execution in playwright)
-    meta:{
-        bot: Bot,
-        patients: Array<Patient>,
-        config: Record<string, unknown>
-        rv: Record<string, unknown>
-        outputPath?: string,
-        logsPath?: string,
-        workers?: number,
-        retries?: number,
-        headed?: boolean,
-    }
+    meta: Meta
 }

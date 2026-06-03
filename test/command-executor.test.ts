@@ -6,6 +6,19 @@ import test from "node:test";
 
 import { runPlaywrightProject } from "../src/libs/command-executor";
 
+const sampleMeta = {
+  bot: {
+    botName: "eligibility-bot",
+    targetUrl: "https://example.test",
+    username: "runner",
+    password: "secret",
+    otherInformation: {}
+  },
+  patients: [],
+  config: {},
+  rv: {}
+};
+
 function waitForClose(child: ReturnType<typeof runPlaywrightProject>): Promise<number | null> {
   return new Promise((resolve, reject) => {
     child.on("error", reject);
@@ -52,7 +65,7 @@ test("runPlaywrightProject runs create-context before playwright", async () => {
 
     const fakeNpxScript = `#!/usr/bin/env sh
 printf '%s\n' "$@" > "$NPX_ARGS_FILE"
-printf 'RUN_ID=%s\nENV=%s\nHTML_PATH=%s\n' "$RUN_ID" "$ENV" "$HTML_PATH" > "$NPX_ENV_FILE"
+printf 'RUN_ID=%s\nENV=%s\nHTML_PATH=%s\nMETA=%s\n' "$RUN_ID" "$ENV" "$HTML_PATH" "$META" > "$NPX_ENV_FILE"
 exit 0
 `;
 
@@ -70,7 +83,8 @@ exit 0
       retries: 1,
       headed: true,
       playwrightFolder,
-      jobId: "job-123"
+      jobId: "job-123",
+      meta: sampleMeta
     });
 
     const code = await waitForClose(child);
@@ -91,6 +105,7 @@ exit 0
     assert.match(envInfo, /RUN_ID=job-123/);
     assert.match(envInfo, /ENV=production/);
     assert.match(envInfo, /HTML_PATH=.*job-123/);
+    assert.match(envInfo, /META=.*"botName":"eligibility-bot"/);
   } finally {
     process.env.PATH = oldPath;
     if (oldArgsFile === undefined) delete process.env.NPX_ARGS_FILE;
@@ -151,7 +166,8 @@ exit 0
       retries: 0,
       headed: false,
       playwrightFolder,
-      jobId: "job-124"
+      jobId: "job-124",
+      meta: sampleMeta
     });
 
     const code = await waitForClose(child);

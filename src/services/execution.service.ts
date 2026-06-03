@@ -28,6 +28,16 @@ export async function createExecution(payload: CreateExecutionRequest) {
     assertAllowedPlaywrightProject(payload.project);
 
     const playwrightFolder = getPlaywrightRootFolder();
+    const workers = normalizePositiveInteger(payload.meta.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10));
+    const retries = normalizeRetries(payload.meta.retries);
+    const headed = Boolean(payload.meta.headed);
+    const normalizedMeta = {
+        ...payload.meta,
+        workers,
+        retries,
+        headed,
+    };
+
     const execution = await ExecutionModel.create({
         createdBy: payload.createdBy,
         playwrightProject: payload.project,
@@ -36,16 +46,17 @@ export async function createExecution(payload: CreateExecutionRequest) {
         clinic: payload.clinic,
         execution: payload.execution,
         botName: payload.botName,
-        meta: payload.meta
+        meta: normalizedMeta,
     });
 
     const jobData: ExecutionJobData = {
         executionId: execution.id,
         project: payload.project,
-        workers: normalizePositiveInteger(payload.meta.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10)),
-        retries: normalizeRetries(payload.meta.retries),
-        headed: Boolean(payload.meta.headed),
+        workers,
+        retries,
+        headed,
         playwrightFolder,
+        meta: normalizedMeta,
     };
 
     const queue = getExecutionQueue();
@@ -67,8 +78,8 @@ export async function createExecution(payload: CreateExecutionRequest) {
     ).lean();
 }
 
-export async function listExecutions() {
-    return ExecutionModel.find({}).sort({ createdAt: -1 }).lean();
+export async function listExecutions(query?:any) {
+    return ExecutionModel.find(query ?? {}).sort({ createdAt: -1 }).lean();
 }
 
 export async function getExecutionById(id: string) {

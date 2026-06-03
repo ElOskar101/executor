@@ -235,6 +235,49 @@ const router = express.Router();
  */
 
 router.post('/executions', createExecution);
+
+/**
+ * @openapi
+ * /api/v1/executions/schedule:
+ *   post:
+ *     tags: [Executions]
+ *     summary: Schedule a new Playwright execution
+ *     description: Creates an execution in scheduled status and enqueues a delayed BullMQ job using scheduledAt.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateExecutionRequest'
+ *           example:
+ *             project: elg-regression
+ *             scheduledAt: 2026-06-03T15:52:00.000Z
+ *             meta:
+ *               bot:
+ *                 botName: eligibility-bot
+ *                 targetUrl: https://portal.example.com
+ *                 username: runner_user
+ *                 password: runner_password
+ *                 otherInformation: {}
+ *               patients: []
+ *               config: {}
+ *               rv: {}
+ *     responses:
+ *       200:
+ *         description: Execution scheduled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Execution'
+ *       400:
+ *         description: Validation or configuration error (including invalid scheduledAt)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Unexpected server error
+ */
 router.post('/executions/schedule', createScheduledExecution);
 router.get('/executions', getExecutions);
 
@@ -386,6 +429,36 @@ router.post('/executions/:id/stop', stopExecution);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/executions/:id/pause', pauseExecution);
+
+/**
+ * @openapi
+ * /api/v1/executions/{id}/run-now:
+ *   post:
+ *     tags: [Executions]
+ *     summary: Run a scheduled execution immediately
+ *     description: Promotes a delayed BullMQ job so it runs now instead of waiting for scheduledAt.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Scheduled execution moved to queue for immediate run
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Execution'
+ *       404:
+ *         description: Execution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Unexpected server error
+ */
 router.post('/executions/:id/run-now', runScheduledExecutionNow);
 
 /**

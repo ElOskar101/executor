@@ -44,7 +44,7 @@ export const createScheduledExecution = async (req: Request, res: Response) => {
         const execution = await createQueuedScheduledExecution(req.body as CreateExecutionRequest & { scheduleAt?: string | Date });
         onSuccess(execution, res);
     } catch (e) {
-        if (e instanceof Error && (e.message.includes("not allowed") || e.message.includes("not configured"))) {
+        if (e instanceof Error && (e.message.includes("not allowed") || e.message.includes("not configured") || e.message.includes("scheduledAt"))) {
             return onBadRequest(e.message, res);
         }
 

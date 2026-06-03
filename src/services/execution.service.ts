@@ -32,11 +32,20 @@ export async function createExecution(payload: CreateExecutionRequest) {
 export async function createScheduledExecution(payload: CreateExecutionRequest) {
     const scheduledAtValue = payload.scheduledAt;
     const scheduledAtDate = scheduledAtValue ? new Date(scheduledAtValue) : null;
+
+    if (!scheduledAtDate || Number.isNaN(scheduledAtDate.getTime())) {
+        throw new Error("scheduledAt must be a valid ISO date string");
+    }
+
     const delay = scheduledAtDate && !Number.isNaN(scheduledAtDate.getTime())
-        ? Math.max(0, scheduledAtDate.getTime() - Date.now())
+        ? scheduledAtDate.getTime() - Date.now()
         : 0;
 
-    return enqueueExecution(payload, "scheduled", delay, scheduledAtDate ?? undefined);
+    if (delay <= 0) {
+        throw new Error("scheduledAt must be a future date (at least 1 second from now)");
+    }
+
+    return enqueueExecution(payload, "scheduled", delay, scheduledAtDate);
 }
 
 async function enqueueExecution(payload: CreateExecutionRequest, status: ExecutionStatus, delay = 0, scheduledAt?: Date) {
@@ -81,7 +90,7 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
         jobData,
         {
             jobId: execution.id,
-            ...(delay > 0 ? { delay } : {}), // If delay does not exist or is in the past it will be added to the queue immediately
+            ...(delay > 0 ? { delay } : {}), // If delay does not exist or is in the past, it will be added to the queue immediately
         },
     );
 

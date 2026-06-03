@@ -1,5 +1,5 @@
 ### GET request to example server
-POST http://localhost:3018/api/v1/executions
+POST http://localhost:3018/api/v1/executions/schedule
 content-type: application/json
 
 {
@@ -8,6 +8,7 @@ content-type: application/json
   "client": "Salt Dental Partners",
   "clinic": "Smile For Kids ",
   "botName": "Liberty Dental Plan",
+  "scheduledAt":"2026-06-03T22:18:39.914Z",
   "meta": {
     "bot": {
       "botName": "Liberty Dental Plan",

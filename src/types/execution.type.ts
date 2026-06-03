@@ -64,7 +64,7 @@ export default interface Execution {
     _id: Types.ObjectId,
     // Execution properties only for record keeping (creation, update, runtime jobs)
     runId: string,
-    playwrightProject: string,
+    project: string,
     status: ExecutionStatus
     startedAt: Date,
     finishedAt: Date,

@@ -30,7 +30,7 @@ const patient = new Schema({ // Patient that would be tested in playwright
 const ExecutionSchema = new Schema({
     // Execution properties only for record keeping (creation, update, runtime jobs)
     runId: String,
-    playwrightProject: String,
+    project: String,
     status: {type:String, required:true, enum:['queued', 'running', 'paused', 'completed', 'unknown', 'cancelled', 'failed']},
     startedAt: Date,
     finishedAt: Date,

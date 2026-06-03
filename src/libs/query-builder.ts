@@ -3,7 +3,7 @@ import {ParsedQs} from "qs";
 
 type RawQueryValue = string | ParsedQs | (string | ParsedQs)[] | undefined;
 
-type SupportedQueryParam = "by" | "client" | "clinic" | "execution" | "bot" | "from" | "to" | "dateField" | "status";
+type SupportedQueryParam = "by" | "client" | "clinic" | "execution" | "bot" | "from" | "to" | "dateField" | "status" | "project" ;
 
 const SUPPORTED_QUERY_PARAMS: Set<SupportedQueryParam> = new Set([
     "by",
@@ -14,7 +14,8 @@ const SUPPORTED_QUERY_PARAMS: Set<SupportedQueryParam> = new Set([
     "from",
     "to",
     "dateField",
-    "status"
+    "status",
+    "project"
 ]);
 
 export interface Query {
@@ -26,6 +27,7 @@ export interface Query {
     bot?: string[];
     from?: Date;
     to?: Date;
+    project?: string[];
     dateField?: string;
 }
 
@@ -36,23 +38,26 @@ export const createQuery = async (rawQuery: ParsedQs = {}): Promise<MongoQuery> 
         let query: MongoQuery = {};
         const r = transformQuery(rawQuery);
 
-        if (r["by"])
+        if (r.by)
             query = addParams(query, {createdBy: r.by});
 
-        if (r["client"])
+        if (r.client)
             query = addParams(query, {client: r.client});
 
-        if (r["status"])
+        if (r.status)
             query = addParams(query, {status: r.status});
 
-        if (r["clinic"])
+        if (r.project)
+            query = addParams(query, {status: r.project});
+
+        if (r.clinic)
             query = addParams(query, {clinic: r.clinic});
 
-        if (r["execution"]) {
+        if (r.execution) {
             query = addParams(query, {execution: r.execution});
         }
-        if (r["bot"])
-            query = addParams(query, {botName: r["bot"][0]});
+        if (r.bot)
+            query = addParams(query, {botName: r.bot});
 
         if ((r.from && !r.to) || (r.from && r.to))
             query = addParams(query, buildDateRangeQuery(r.from, r.to, r.dateField) as MongoQuery);
@@ -89,7 +94,8 @@ export const transformQuery = (rawQuery: ParsedQs): Query => {
         from: toDate(filteredQuery.from, "from"),
         to: toDate(filteredQuery.to, "to"),
         dateField: toSingleString(filteredQuery.dateField, "dateField"),
-        status: toStringArray(filteredQuery.status, "status")
+        status: toStringArray(filteredQuery.status, "status"),
+        project: toStringArray(filteredQuery.status, "project")
     };
 };
 

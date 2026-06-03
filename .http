@@ -64,7 +64,7 @@ content-type: application/json
 }
 
 ### GET request to example server
-GET http://localhost:3017/api/v1/executions
+GET http://localhost:3017/api/v1/executions?status=completed&limit=2
 content-type: application/json
 
 ### GET request to example server

@@ -3,7 +3,7 @@ import {ParsedQs} from "qs";
 
 type RawQueryValue = string | ParsedQs | (string | ParsedQs)[] | undefined;
 
-type SupportedQueryParam = "by" | "client" | "clinic" | "execution" | "bot" | "from" | "to" | "dateField";
+type SupportedQueryParam = "by" | "client" | "clinic" | "execution" | "bot" | "from" | "to" | "dateField" | "status";
 
 const SUPPORTED_QUERY_PARAMS: Set<SupportedQueryParam> = new Set([
     "by",
@@ -14,12 +14,14 @@ const SUPPORTED_QUERY_PARAMS: Set<SupportedQueryParam> = new Set([
     "from",
     "to",
     "dateField",
+    "status"
 ]);
 
 export interface Query {
     by?: string[];
     client?: string[];
     clinic?: string[];
+    status?: string[];
     execution?: string[];
     bot?: string[];
     from?: Date;
@@ -39,6 +41,9 @@ export const createQuery = async (rawQuery: ParsedQs = {}): Promise<MongoQuery> 
 
         if (r["client"])
             query = addParams(query, {client: r.client});
+
+        if (r["status"])
+            query = addParams(query, {status: r.status});
 
         if (r["clinic"])
             query = addParams(query, {clinic: r.clinic});
@@ -71,22 +76,20 @@ function addParams(query: MongoQuery, params: MongoQuery): MongoQuery {
  */
 export const transformQuery = (rawQuery: ParsedQs): Query => {
     const query = rawQuery as Record<string, RawQueryValue>;
-
-    for (const key of Object.keys(query)) {
-        if (!SUPPORTED_QUERY_PARAMS.has(key as SupportedQueryParam)) {
-            throw new Error(`Unsupported query parameter: ${key}`);
-        }
-    }
+    const filteredQuery = Object.fromEntries(
+        Object.entries(query).filter(([key]) => SUPPORTED_QUERY_PARAMS.has(key as SupportedQueryParam))
+    ) as Partial<Record<SupportedQueryParam, RawQueryValue>>;
 
     return {
-        by: toStringArray(query.by, "by"),
-        client: toStringArray(query.client, "client"),
-        clinic: toStringArray(query.clinic, "clinic"),
-        execution: toStringArray(query.execution, "execution"),
-        bot: toStringArray(query.bot, "bot"),
-        from: toDate(query.from, "from"),
-        to: toDate(query.to, "to"),
-        dateField: toSingleString(query.dateField, "dateField"),
+        by: toStringArray(filteredQuery.by, "by"),
+        client: toStringArray(filteredQuery.client, "client"),
+        clinic: toStringArray(filteredQuery.clinic, "clinic"),
+        execution: toStringArray(filteredQuery.execution, "execution"),
+        bot: toStringArray(filteredQuery.bot, "bot"),
+        from: toDate(filteredQuery.from, "from"),
+        to: toDate(filteredQuery.to, "to"),
+        dateField: toSingleString(filteredQuery.dateField, "dateField"),
+        status: toStringArray(filteredQuery.status, "status")
     };
 };
 

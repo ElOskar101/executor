@@ -78,8 +78,10 @@ export async function createExecution(payload: CreateExecutionRequest) {
     ).lean();
 }
 
-export async function listExecutions(query?:any) {
-    return ExecutionModel.find(query ?? {}).sort({ createdAt: -1 }).lean();
+export async function listExecutions(query?:any, limit?: number) {
+    return ExecutionModel.find(query ?? {}).sort({ createdAt: -1 })
+        .limit(limit ?? 999)
+        .lean();
 }
 
 export async function getExecutionById(id: string) {

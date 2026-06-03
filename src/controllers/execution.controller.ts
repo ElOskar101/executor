@@ -40,8 +40,9 @@ export const createExecution = async (req: Request, res: Response) => {
 export const getExecutions = async (req:Request, res:Response) => {
     try{
         const query = await createQuery(req.query);
+        const limit  = Number (req.query.limit) || 999;
         logger.info(`Query executions: ${JSON.stringify(query)}`);
-        const executions = await listExecutions(query) as Execution[];
+        const executions = await listExecutions(query, limit) as Execution[];
         onSuccess(executions, res);
     }catch (e) {
         onError(e, __filename, "getExecutions", res);

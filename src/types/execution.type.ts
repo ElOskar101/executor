@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export type ExecutionStatus = 'queued' | 'running' | 'paused' | 'completed' | 'unknown' | 'cancelled' | 'failed';
+export type ExecutionStatus = 'queued' | 'running' | 'paused' | 'completed' | 'unknown' | 'cancelled' | 'failed' | 'scheduled';
 export type ExecutionType = 'elg' | 'fbd';
 
 interface Patient { // Patient that would be tested in playwright
@@ -35,6 +35,7 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     clinic?: string;
     execution?: string;
     botName?: string;
+    scheduledAt?: Date;
     meta: Meta;
 }
 
@@ -66,6 +67,7 @@ export default interface Execution {
     runId: string,
     project: string,
     status: ExecutionStatus
+    scheduledAt?: Date,
     startedAt: Date,
     finishedAt: Date,
     notes: string[],

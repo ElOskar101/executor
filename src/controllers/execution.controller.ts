@@ -4,10 +4,12 @@ import {onBadRequest, onError, onNotFound, onSuccess} from "../libs/res-handler"
 import {Request, Response} from "express";
 import {
     createExecution as createQueuedExecution,
+    createScheduledExecution as createQueuedScheduledExecution,
     getExecutionById,
     getExecutionWithLogs,
     listExecutions,
     pauseExecutionById,
+    runScheduledExecutionNowById,
     resumeExecutionById,
     stopExecutionById
 } from "../services/execution.service";
@@ -34,6 +36,34 @@ export const createExecution = async (req: Request, res: Response) => {
         }
 
         onError(e, __filename, "createExecution", res);
+    }
+}
+
+export const createScheduledExecution = async (req: Request, res: Response) => {
+    try {
+        const execution = await createQueuedScheduledExecution(req.body as CreateExecutionRequest & { scheduleAt?: string | Date });
+        onSuccess(execution, res);
+    } catch (e) {
+        if (e instanceof Error && (e.message.includes("not allowed") || e.message.includes("not configured"))) {
+            return onBadRequest(e.message, res);
+        }
+
+        onError(e, __filename, "createScheduledExecution", res);
+    }
+}
+
+export const runScheduledExecutionNow = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const execution = await runScheduledExecutionNowById(id) as Execution | null;
+
+        if (!execution) {
+            return onNotFound("Execution not found", res);
+        }
+
+        onSuccess(execution, res);
+    } catch (e) {
+        onError(e, __filename, "runScheduledExecutionNow", res);
     }
 }
 

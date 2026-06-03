@@ -2,10 +2,12 @@ import express from 'express';
 
 import {
     createExecution,
+    createScheduledExecution,
     deleteExecution,
     getExecution,
     getExecutions,
     pauseExecution,
+    runScheduledExecutionNow,
     resumeExecution,
     stopExecution,
     updateExecution
@@ -159,7 +161,7 @@ const router = express.Router();
  *           example: 682ba2f2d2930c4fd5e984c4
  *         status:
  *           type: string
- *           enum: [queued, running, paused, completed, unknown, cancelled, failed]
+ *           enum: [queued, running, paused, completed, unknown, cancelled, failed, scheduled]
  *         playwrightProject:
  *           type: string
  *         createdBy:
@@ -233,6 +235,7 @@ const router = express.Router();
  */
 
 router.post('/executions', createExecution);
+router.post('/executions/schedule', createScheduledExecution);
 router.get('/executions', getExecutions);
 
 /**
@@ -383,6 +386,7 @@ router.post('/executions/:id/stop', stopExecution);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/executions/:id/pause', pauseExecution);
+router.post('/executions/:id/run-now', runScheduledExecutionNow);
 
 /**
  * @openapi

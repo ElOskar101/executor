@@ -84,7 +84,7 @@ exit 0
       headed: true,
       playwrightFolder,
       jobId: "job-123",
-      meta: sampleMeta
+      context: sampleMeta
     });
 
     const code = await waitForClose(child);
@@ -167,7 +167,7 @@ exit 0
       headed: false,
       playwrightFolder,
       jobId: "job-124",
-      meta: sampleMeta
+      context: sampleMeta
     });
 
     const code = await waitForClose(child);

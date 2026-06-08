@@ -26,7 +26,7 @@ export const createExecution = async (req: Request, res: Response) => {
             return onBadRequest("Project is required", res);
         }
         logger.info(
-            `User requested execution for project=${payload.project} patients=${payload.meta.patients.length}`,
+            `User requested execution for project=${payload.project} patients=${payload.context.patients.length}`,
         );
         const execution = await createQueuedExecution(payload);
         onSuccess(execution, res);
@@ -72,7 +72,7 @@ export const getExecutions = async (req:Request, res:Response) => {
         const query = await createQuery(req.query);
         const limit  = Number (req.query.limit) || 999;
         logger.info(`Query executions: ${JSON.stringify(query)}`);
-        const executions = await listExecutions(query, limit) as Execution[];
+        const executions = await listExecutions(query, limit) as unknown as Execution[];
         onSuccess(executions, res);
     }catch (e) {
         onError(e, __filename, "getExecutions", res);
@@ -158,7 +158,7 @@ export const updateExecution = async (req: Request, res:Response) => {
     try{
         const { id } = req.params;
         const payload = req.body as Execution;
-        const result = await _updateExecution(id, payload) as Execution;
+        const result = await _updateExecution(id, payload) as unknown as Execution;
         onSuccess(result, res);
     }catch (e) {
         onError(e, __filename, "updateExecution", res);

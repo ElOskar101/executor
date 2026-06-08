@@ -1,5 +1,5 @@
 ### GET request to example server
-POST http://localhost:3018/api/v1/executions/schedule
+POST http://localhost:3018/api/v1/executions/
 content-type: application/json
 
 {
@@ -8,8 +8,7 @@ content-type: application/json
   "client": "Salt Dental Partners",
   "clinic": "Smile For Kids ",
   "botName": "Liberty Dental Plan",
-  "scheduledAt":"2026-06-03T22:18:39.914Z",
-  "meta": {
+  "context": {
     "bot": {
       "botName": "Liberty Dental Plan",
       "targetUrl": "https://providerportal.libertydentalplan.com",
@@ -21,35 +20,45 @@ content-type: application/json
     },
     "patients": [
       {
-        "patientName": "Ana",
-        "patientLastName": "Lopez",
-        "patientMemberId": "035351523",
-        "patientDob": "1985-03-10",
-        "policyHolderName": "Ana",
-        "policyHolderLastName": "Lopez",
-        "policyHolderDob": "1985-03-10",
-        "relationship": "self",
-        "zipCode": "90001",
-        "clinic": "Downtown Clinic",
+        "id": "69e271a8ea737392921aaa29",
+        "patientName": {
+          "key": "patient_name",
+          "value": "Ana"
+        },
+        "patientLastName": {
+          "key": "1",
+          "value": "Lopez"
+        },
+        "patientMemberId": {
+          "key": "2",
+          "value": "035351523"
+        },
+        "patientDob": {
+          "key": "3",
+          "value": "1985-03-10"
+        },
+        "policyHolderName":{
+          "key": "4",
+          "value": "Ana"
+        },
+        "policyHolderLastName": {
+          "key": "g",
+          "value": "Lopez"
+        },
+        "policyHolderDob": {
+          "key": "5",
+          "value": "1985-03-10"
+        },
+        "relationship": {
+          "key": "6",
+          "value": "self"
+        },
+        "zipCode": {
+          "key": "7",
+          "value": "90001"
+        },
         "verificationType": "elg",
-        "filenames": "ana-lopez.pdf",
-        "otherInformation": {
-          "plan": "Gold"
-        }
-      },
-      {
-        "patientName": "Ana",
-        "patientLastName": "Lopez",
-        "patientMemberId": "A10001",
-        "patientDob": "1985-03-10",
-        "policyHolderName": "Ana",
-        "policyHolderLastName": "Lopez",
-        "policyHolderDob": "1985-03-10",
-        "relationship": "self",
-        "zipCode": "90001",
-        "clinic": "Downtown Clinic",
-        "verificationType": "elg",
-        "filenames": "ana-lopez.pdf",
+        "filenames": ["ana-lopez.pdf"],
         "otherInformation": {
           "plan": "Gold"
         }
@@ -60,7 +69,10 @@ content-type: application/json
     "outputPath": "/tmp/reports",
     "logsPath": "/tmp/logs",
     "workers": 2,
-    "retries": 1
+    "retries": 1,
+    "executionId": "69e271a8ea737392921aaa28",
+    "apiUrl": "https://dev-carrier.dentalautomation.ai/",
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMmY3OTI2M2NjZGM4NTQwMzBhMzk5OSIsImlhdCI6MTc4MDk1MjA3NiwiZXhwIjoxNzgzNTQ0MDc2fQ.jallZmvYZhl7FjzQYJE7xyRow7ToJ-mPYLTjecvCNGY"
   }
 }
 

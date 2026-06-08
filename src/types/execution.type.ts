@@ -3,20 +3,24 @@ import { Types } from "mongoose";
 export type ExecutionStatus = 'queued' | 'running' | 'paused' | 'completed' | 'unknown' | 'cancelled' | 'failed' | 'scheduled';
 export type ExecutionType = 'elg' | 'fbd';
 
+export interface PatientPropertyDetail {
+    key: string,
+    value: string,
+}
+
 interface Patient { // Patient that would be tested in playwright
     id?: string
-    patientName: string,
-    patientLastName: string,
-    patientMemberId: string,
-    patientDob: string,
-    policyHolderName: string,
-    policyHolderLastName: string,
-    policyHolderDob: string,
-    relationship: string,
-    zipCode: string,
-    clinic: string,
+    patientName: PatientPropertyDetail,
+    patientLastName: PatientPropertyDetail,
+    patientMemberId: PatientPropertyDetail,
+    patientDob: PatientPropertyDetail,
+    policyHolderName: PatientPropertyDetail,
+    policyHolderLastName: PatientPropertyDetail,
+    policyHolderDob: PatientPropertyDetail,
+    relationship: PatientPropertyDetail,
+    zipCode: PatientPropertyDetail,
     verificationType: ExecutionType,
-    filenames: string,
+    filenames: [string],
     otherInformation: Record<string, unknown>
 }
 
@@ -36,7 +40,7 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     execution?: string;
     botName?: string;
     scheduledAt?: Date;
-    meta: Meta;
+    context: Context;
 }
 
 export interface ExecutionJobData {
@@ -46,12 +50,15 @@ export interface ExecutionJobData {
     retries: number;
     headed: boolean;
     playwrightFolder: string;
-    meta: Meta;
+    context: Context;
 }
 
-export interface Meta {
+export interface Context {
     bot: Bot,
+    executionId?: string;
     patients: Array<Patient>,
+    accessToken?: string,
+    apiUrl?: string,
     config: Record<string, unknown>
     rv: Record<string, unknown>
     outputPath?: string,
@@ -64,20 +71,20 @@ export interface Meta {
 export default interface Execution {
     _id: Types.ObjectId,
     // Execution properties only for record keeping (creation, update, runtime jobs)
-    runId: string,
+    runId?: string,
     project: string,
     status: ExecutionStatus
     scheduledAt?: Date,
-    startedAt: Date,
-    finishedAt: Date,
+    startedAt?: Date,
+    finishedAt?: Date,
     notes: string[],
     // Control properties for requesting filters (GETs, http requests after execution)
-    createdBy: string,
-    client: string,
-    clinic: string,
-    execution: string,
-    botName: string,
+    createdBy?: string,
+    client?: string,
+    clinic?: string,
+    execution?: string,
+    botName?: string,
     // Playwright execution properties needed for playwright project runtime. It is like runtime context
     // (Runtime context for execution in playwright)
-    meta: Meta
+    context: Context
 }

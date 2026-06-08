@@ -165,7 +165,7 @@ export async function runExecution(data: ExecutionJobData & { jobId?: string }):
 // ---------------------------------------------------------------------------
 
 async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
-    const { executionId, project, workers, retries, headed, playwrightFolder, meta, jobId } = data;
+    const { executionId, project, workers, retries, headed, playwrightFolder, context, jobId } = data;
     assertAllowedPlaywrightProject(project);
 
     const resolvedJobId = String(jobId || "direct");
@@ -182,7 +182,7 @@ async function handleExecutionJob(data: ExecutionJobData & { jobId?: string }) {
         workers,
         retries,
         headed,
-        meta,
+        context,
         playwrightFolder,
         jobId: resolvedJobId,
     });

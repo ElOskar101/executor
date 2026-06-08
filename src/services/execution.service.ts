@@ -52,11 +52,11 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
     assertAllowedPlaywrightProject(payload.project);
 
     const playwrightFolder = getPlaywrightRootFolder();
-    const workers = normalizePositiveInteger(payload.meta.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10));
-    const retries = normalizeRetries(payload.meta.retries);
-    const headed = Boolean(payload.meta.headed);
-    const normalizedMeta = {
-        ...payload.meta,
+    const workers = normalizePositiveInteger(payload.context.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10));
+    const retries = normalizeRetries(payload.context.retries);
+    const headed = Boolean(payload.context.headed);
+    const normalizedContext = {
+        ...payload.context,
         workers,
         retries,
         headed,
@@ -64,14 +64,14 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
 
     const execution = await ExecutionModel.create({
         createdBy: payload.createdBy,
-        playwrightProject: payload.project,
+        project: payload.project,
         status,
         client: payload.client,
         clinic: payload.clinic,
         execution: payload.execution,
         botName: payload.botName,
         scheduledAt,
-        meta: normalizedMeta,
+        context: normalizedContext,
     });
 
     const jobData: ExecutionJobData = {
@@ -81,7 +81,7 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
         retries,
         headed,
         playwrightFolder,
-        meta: normalizedMeta,
+        context: normalizedContext,
     };
 
     const queue = getExecutionQueue();

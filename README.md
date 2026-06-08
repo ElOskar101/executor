@@ -29,6 +29,8 @@ Variables clave:
 - `PLAYWRIGHT_PROJECT_ROOT_FOLDER`
 - `ALLOWED_PLAYWRIGHT_PROJECTS=cigna,aetna,shared`
 - `WORKER_CONCURRENCY=3`
+- `CORS_ORIGIN=http://localhost:5173` (o lista separada por comas, por ejemplo `http://localhost:5173,https://app.midominio.com`)
+- `SOCKET_CORS_ORIGIN` (opcional; si no se define usa `CORS_ORIGIN`)
 
 ## Desarrollo
 

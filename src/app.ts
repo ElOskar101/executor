@@ -12,11 +12,45 @@ const app = express();
 const reportsFolder = path.resolve(process.cwd(), 'reports');
 const reportsFrameAncestor = "https://agent.controlcentralcarrier.com";
 const logger = createLogger('app');
+const corsOriginEnv = process.env.CORS_ORIGIN || process.env.SOCKET_CORS_ORIGIN || '*';
+const allowedCorsOrigins = corsOriginEnv
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+function resolveCorsOrigin(requestOrigin?: string) {
+  if (allowedCorsOrigins.includes('*')) return '*';
+  if (!requestOrigin) return '';
+  if (allowedCorsOrigins.includes(requestOrigin)) return requestOrigin;
+  return '';
+}
 
 app.use(morgan('dev'));
 app.use(express.json());
 app.set('trust proxy', 1);
 app.use(helmet());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const requestOrigin = req.headers.origin;
+  const allowedOrigin = resolveCorsOrigin(typeof requestOrigin === 'string' ? requestOrigin : undefined);
+
+  if (allowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+    if (allowedOrigin !== '*') {
+      res.setHeader('Vary', 'Origin');
+    }
+  }
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
 
 app.use('/reports', (req: Request, res: Response, next: NextFunction) => {
   // Allow framing only for reports and only from the trusted frontend origin.

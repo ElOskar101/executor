@@ -19,7 +19,7 @@ function parseMessage(message: string) {
 export async function setupSocketServer(server: HttpServer) {
     io = new SocketServer(server, {
         cors: {
-            origin: process.env.SOCKET_CORS_ORIGIN || "*",
+            origin: process.env.SOCKET_CORS_ORIGIN || process.env.CORS_ORIGIN || "*",
         },
     });
 

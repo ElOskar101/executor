@@ -4,12 +4,9 @@
   "description": "Basic Express API starter with Swagger and Morgan",
   "main": "dist/src/server.js",
   "scripts": {
-    "dev": "npm run dev:api",
-    "dev:api": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
-    "dev:worker": "nodemon --watch src --ext ts --exec ts-node src/workers/playwright.worker.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/src/server.js",
-    "start:worker": "node dist/src/workers/playwright.worker.js",
     "test": "npm run build && node --test dist/test/**/*.test.js"
   },
   "keywords": [],

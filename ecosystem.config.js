@@ -8,15 +8,6 @@ module.exports = {
       env: {
         NODE_ENV: "production",
       },
-    },
-    {
-      name: "executor-worker",
-      script: "dist/src/workers/playwright.worker.js",
-      instances: 1,
-      exec_mode: "fork",
-      env: {
-        NODE_ENV: "production",
-      },
-    },
+    }
   ],
 };

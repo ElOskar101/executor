@@ -1,5 +1,5 @@
 ### GET request to example server
-POST http://localhost:3018/api/v1/executions/
+POST http://localhost:3017/api/v1/executions/
 content-type: application/json
 
 {

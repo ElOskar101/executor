@@ -4,6 +4,8 @@ import { Server as SocketServer } from "socket.io";
 
 import { createRedisConnection, REDIS_CHANNELS } from "../configs/redis.config";
 import { readExecutionLog } from "../adapters/mongo.adapter";
+import { createExecutionRealtimePersister } from "./execution-realtime-persister.service";
+import { ExecutionLogEvent, ExecutionStatusEvent } from "../types/realtime.type";
 
 let io: SocketServer | null = null;
 let subscriber: ReturnType<typeof createRedisConnection> | null = null;
@@ -16,7 +18,24 @@ function parseMessage(message: string) {
     }
 }
 
+function isExecutionLogEvent(payload: any): payload is ExecutionLogEvent {
+    return payload
+        && typeof payload.executionId === "string"
+        && typeof payload.message === "string"
+        && (payload.stream === "stdout" || payload.stream === "stderr" || payload.stream === "system")
+        && typeof payload.timestamp === "string";
+}
+
+function isExecutionStatusEvent(payload: any): payload is ExecutionStatusEvent {
+    return payload
+        && typeof payload.executionId === "string"
+        && typeof payload.status === "string"
+        && typeof payload.timestamp === "string";
+}
+
 export async function setupSocketServer(server: HttpServer) {
+    const realtimePersister = createExecutionRealtimePersister();
+
     io = new SocketServer(server, {
         cors: {
             origin: process.env.SOCKET_CORS_ORIGIN || "*",
@@ -43,9 +62,21 @@ export async function setupSocketServer(server: HttpServer) {
     subscriber = createRedisConnection();
     await subscriber.subscribe(REDIS_CHANNELS.logs, REDIS_CHANNELS.status, REDIS_CHANNELS.metrics);
 
-    subscriber.on("message", (channel, message) => {
+    subscriber.on("message", async (channel, message) => {
         const payload = parseMessage(message);
         const executionId = payload.executionId;
+
+        try {
+            if (channel === REDIS_CHANNELS.logs && isExecutionLogEvent(payload)) {
+                await realtimePersister.persistLogEvent(payload);
+            }
+
+            if (channel === REDIS_CHANNELS.status && isExecutionStatusEvent(payload)) {
+                await realtimePersister.persistStatusEvent(payload);
+            }
+        } catch (error) {
+            console.error(`[SOCKET] Failed to persist ${channel} event`, error);
+        }
 
         if (executionId) {
             io?.to(`execution:${executionId}`).emit(channel, payload);

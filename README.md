@@ -30,6 +30,26 @@ Variables clave:
 - `ALLOWED_PLAYWRIGHT_PROJECTS=cigna,aetna,shared`
 - `WORKER_CONCURRENCY=3`
 
+## Docker (API + Redis)
+
+Este repo incluye `docker-compose.yml` para levantar API, Redis y Mongo.
+
+Puertos expuestos por defecto:
+
+- API: `3018`
+- Redis (host): `6380` -> Redis (container): `6379`
+
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+Los servicios usan `restart: unless-stopped`, por lo que quedan ejecutando por defecto hasta que los detengas.
+
+```bash
+docker compose down
+```
+
 ## Desarrollo
 
 ```bash

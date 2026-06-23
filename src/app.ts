@@ -56,6 +56,7 @@ app.use('/reports', (req: Request, res: Response, next: NextFunction) => {
   // Allow framing only for reports and only from the trusted frontend origin.
   res.removeHeader('X-Frame-Options');
   res.setHeader('Content-Security-Policy', `frame-ancestors 'self' ${reportsFrameAncestor};`);
+  res.setHeader('Content-Security-Policy', `frame-ancestors 'self' http://localhost:8080`);
   next();
 });
 

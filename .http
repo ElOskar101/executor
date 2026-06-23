@@ -1,5 +1,5 @@
 ### GET request to example server
-POST http://localhost:3018/api/v1/executions/
+POST http://localhost:3017/api/v1/executions/
 content-type: application/json
 
 {
@@ -72,7 +72,7 @@ content-type: application/json
     "retries": 1,
     "executionId": "69e271a8ea737392921aaa28",
     "apiUrl": "https://dev-carrier.dentalautomation.ai/",
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMmY3OTI2M2NjZGM4NTQwMzBhMzk5OSIsImlhdCI6MTc4MDk1MjA3NiwiZXhwIjoxNzgzNTQ0MDc2fQ.jallZmvYZhl7FjzQYJE7xyRow7ToJ-mPYLTjecvCNGY"
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMmY3OTI2M2NjZGM4NTQwMzBhMzk5OSIsImlhdCI6MTc4MjI0MzIxNiwiZXhwIjoxNzg0ODM1MjE2fQ.WPiCY0kemzD7_iqbFz2lRyXkOO2dCfvEEZ3opEnMnl4"
   }
 }
 

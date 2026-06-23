@@ -1,0 +1,4 @@
+services:
+  api:
+    image: eloskar101/executor-api:beta
+    pull_policy: always

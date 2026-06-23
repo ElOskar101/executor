@@ -30,10 +30,6 @@ services:
       - redis_data:/data
 
   api:
-    #image: eloskar101/executor-api:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: executor-api
     restart: unless-stopped
     depends_on:
@@ -41,8 +37,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
     environment:
-      REPORTS_PATH: /app/reports # Path inside the container where reports will be exposed
+      REPORTS_PATH: /app/reports
       NODE_ENV: production
       PORT: 3018
       MONGODB_URI: mongodb://mongo:27017/executor
@@ -50,10 +47,12 @@ services:
       REDIS_PORT: 6379
       REDIS_DB: 0
       SOCKET_CORS_ORIGIN: "*"
+
     ports:
       - "3018:3018"
+
     volumes:
-      - ${HOST_REPORTS_PATH:-/var/lib/executor/reports}:/app/reports # Bind mounting reports folder
+      - ${HOST_REPORTS_PATH:-/var/lib/executor/reports}:/app/reports
 
 volumes:
   mongo_data:

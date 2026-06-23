@@ -9,7 +9,7 @@ import path from "path";
 import { createLogger } from './libs/logger';
 
 const app = express();
-const reportsFolder = path.resolve(process.cwd(), 'reports');
+const reportsFolder = path.resolve(process.env.REPORTS_PATH!) || path.resolve(process.cwd(), 'reports');
 const reportsFrameAncestor = "https://agent.controlcentralcarrier.com";
 const logger = createLogger('app');
 const corsOriginEnv = process.env.CORS_ORIGIN || process.env.SOCKET_CORS_ORIGIN || '*';
@@ -61,6 +61,7 @@ app.use('/reports', (req: Request, res: Response, next: NextFunction) => {
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/reports', express.static(reportsFolder));
+logger.info(`Serving reports from ${reportsFolder}`);
 app.use(routes);
 
 app.use(async (req: Request, res: Response) => {

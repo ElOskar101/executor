@@ -3,6 +3,8 @@ services:
     image: mongo:7
     container_name: executor-mongo
     restart: unless-stopped
+    ports:
+      - "27018:27017"
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
@@ -28,6 +30,7 @@ services:
       - redis_data:/data
 
   api:
+    #image: eloskar101/executor-api:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -39,6 +42,7 @@ services:
       redis:
         condition: service_healthy
     environment:
+      REPORTS_PATH: /app/reports # Path inside the container where reports will be exposed
       NODE_ENV: production
       PORT: 3018
       MONGODB_URI: mongodb://mongo:27017/executor
@@ -49,9 +53,8 @@ services:
     ports:
       - "3018:3018"
     volumes:
-      - ./reports:/app/reports
+      - ${HOST_REPORTS_PATH:-/var/lib/executor/reports}:/app/reports # Bind mounting reports folder
 
 volumes:
   mongo_data:
   redis_data:
-

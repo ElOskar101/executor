@@ -16,7 +16,7 @@ type CleanupOptions = {
   deps?: CleanupDeps;
 };
 
-const DEFAULT_REPORTS_FOLDER = path.resolve(process.cwd(), 'reports');
+const DEFAULT_REPORTS_FOLDER = process.env.REPORTS_PATH || "" //path.resolve(process.cwd(), 'reports');
 const MONTHLY_CLEANUP_CRON = '0 0 1 * *';
 
 /**

@@ -21,6 +21,11 @@ connectDb()
       const server = app.listen(PORT, () => {
         logger.info(`Running on http://localhost:${PORT}`);
         logger.info(`Swagger at http://localhost:${PORT}/docs`);
+        logger.info(`Exposing reports at http://localhost:${PORT}/reports/run_id`, );
+        //logger.info(`Storing reports at ${process.env.REPORTS_PATH}`);
+        logger.info(`Environment: ${env}`);
+        logger.info(`For docker mongoDB is exposed on port 27018`);
+        logger.info(`For docker redis is exposed on port 6380`);
       });
       await setupSocketServer(server);
       logger.info(`Socket.io ready on ws://localhost:${PORT}`);

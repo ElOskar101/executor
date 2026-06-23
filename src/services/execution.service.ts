@@ -49,9 +49,9 @@ export async function createScheduledExecution(payload: CreateExecutionRequest) 
 }
 
 async function enqueueExecution(payload: CreateExecutionRequest, status: ExecutionStatus, delay = 0, scheduledAt?: Date) {
-    assertAllowedPlaywrightProject(payload.project);
+    //assertAllowedPlaywrightProject(payload.project); enable only if you want to validate allowed projects
 
-    const playwrightFolder = getPlaywrightRootFolder();
+    //const playwrightFolder = getPlaywrightRootFolder(); Support for bare implementation remove if needed
     const workers = normalizePositiveInteger(payload.context.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10));
     const retries = normalizeRetries(payload.context.retries);
     const headed = Boolean(payload.context.headed);
@@ -80,7 +80,7 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
         workers,
         retries,
         headed,
-        playwrightFolder,
+        //playwrightFolder,
         context: normalizedContext,
     };
 

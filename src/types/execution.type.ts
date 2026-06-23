@@ -49,7 +49,7 @@ export interface ExecutionJobData {
     workers: number;
     retries: number;
     headed: boolean;
-    playwrightFolder: string;
+    //playwrightFolder: string;
     context: Context;
 }
 

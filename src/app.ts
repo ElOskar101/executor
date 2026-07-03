@@ -10,7 +10,12 @@ import { createLogger } from './libs/logger';
 
 const app = express();
 const reportsFolder = path.resolve(process.env.REPORTS_PATH!) || path.resolve(process.cwd(), 'reports');
-const reportsFrameAncestor = "https://agent.controlcentralcarrier.com";
+const reportsFrameAncestors = [
+  "'self'",
+  "https://agent.controlcentralcarrier.com",
+  "http://localhost:*",
+  "https://localhost:*",
+];
 const logger = createLogger('app');
 const corsOriginEnv = process.env.CORS_ORIGIN || process.env.SOCKET_CORS_ORIGIN || '*';
 const allowedCorsOrigins = corsOriginEnv
@@ -53,10 +58,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use('/reports', (req: Request, res: Response, next: NextFunction) => {
-  // Allow framing only for reports and only from the trusted frontend origin.
+  // Allow framing only for reports from trusted frontend origins and local dev ports.
   res.removeHeader('X-Frame-Options');
-  res.setHeader('Content-Security-Policy', `frame-ancestors 'self' ${reportsFrameAncestor};`);
-  res.setHeader('Content-Security-Policy', `frame-ancestors 'self' http://localhost:8080`);
+  res.setHeader('Content-Security-Policy', `frame-ancestors ${reportsFrameAncestors.join(' ')};`);
   next();
 });
 

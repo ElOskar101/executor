@@ -1,28 +1,8 @@
 import { Types } from "mongoose";
 
 export type ExecutionStatus = 'queued' | 'running' | 'paused' | 'completed' | 'unknown' | 'cancelled' | 'failed' | 'scheduled';
-export type ExecutionType = 'elg' | 'fbd';
+export type Env = 'dev' | 'prod';
 
-export interface PatientPropertyDetail {
-    key: string,
-    value: string,
-}
-
-interface Patient { // Patient that would be tested in playwright
-    id?: string
-    patientName: PatientPropertyDetail,
-    patientLastName: PatientPropertyDetail,
-    patientMemberId: PatientPropertyDetail,
-    patientDob: PatientPropertyDetail,
-    policyHolderName: PatientPropertyDetail,
-    policyHolderLastName: PatientPropertyDetail,
-    policyHolderDob: PatientPropertyDetail,
-    relationship: PatientPropertyDetail,
-    zipCode: PatientPropertyDetail,
-    verificationType: ExecutionType,
-    filenames: [string],
-    otherInformation: Record<string, unknown>
-}
 
 interface Bot {// Bot information that would be used for playwright execution
     botName: string,
@@ -40,7 +20,7 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     execution?: string;
     botName?: string;
     scheduledAt?: Date;
-    context: Context;
+    context: Record<string, unknown> //Context;
 }
 
 export interface ExecutionJobData {
@@ -50,22 +30,21 @@ export interface ExecutionJobData {
     retries: number;
     headed: boolean;
     //playwrightFolder: string;
-    context: Context;
+    context: Record<string, unknown>; //Context;
 }
 
 export interface Context {
-    bot: Bot,
     executionId?: string;
-    patients: Array<Patient>,
-    accessToken?: string,
-    apiUrl?: string,
-    config: Record<string, unknown>
-    rv: Record<string, unknown>
-    outputPath?: string,
-    logsPath?: string,
+    env: Env;
+    bot: Record<string, unknown>,
+    clinicConfig: Record<string, unknown>
+    payloadConfigs: Array<Record<string, unknown>>
+    //outputPath?: string,
+    //logsPath?: string,
     workers?: number,
     retries?: number,
     headed?: boolean,
+    patients: Array<Record<string, unknown>>,
 }
 
 export default interface Execution {
@@ -78,6 +57,7 @@ export default interface Execution {
     startedAt?: Date,
     finishedAt?: Date,
     notes: string[],
+    accessToken?: string,
     // Control properties for requesting filters (GETs, http requests after execution)
     createdBy?: string,
     client?: string,

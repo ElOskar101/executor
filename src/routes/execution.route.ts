@@ -46,113 +46,66 @@ const router = express.Router();
  *           additionalProperties: true
  *     Patient:
  *       type: object
- *       required:
- *         - patientName
- *         - patientLastName
- *         - patientMemberId
- *         - patientDob
- *         - policyHolderName
- *         - policyHolderLastName
- *         - policyHolderDob
- *         - relationship
- *         - zipCode
- *         - clinic
- *         - verificationType
- *         - filenames
- *         - otherInformation
- *       properties:
- *         patientName:
- *           type: string
- *         patientLastName:
- *           type: string
- *         patientMemberId:
- *           type: string
- *         patientDob:
- *           type: string
- *           example: 1985-03-10
- *         policyHolderName:
- *           type: string
- *         policyHolderLastName:
- *           type: string
- *         policyHolderDob:
- *           type: string
- *           example: 1985-03-10
- *         relationship:
- *           type: string
- *           example: self
- *         zipCode:
- *           type: string
- *           example: 33101
- *         clinic:
- *           type: string
- *         verificationType:
- *           type: string
- *           enum: [elg, fbd]
- *         filenames:
- *           type: string
- *           example: ana-lopez.pdf
- *         otherInformation:
- *           type: object
- *           additionalProperties: true
+ *       description: Generic patient data object; shape is defined per-project by the client.
+ *       additionalProperties: true
  *     CreateExecutionRequest:
  *       type: object
- *       required: [project, meta]
+ *       required: [project, context]
  *       properties:
  *         project:
  *           type: string
  *           example: elg-regression
  *         createdBy:
  *           type: string
+ *           example: admin
  *         client:
  *           type: string
+ *           example: acme-corp
  *         clinic:
+ *           type: string
+ *           example: Downtown Health
+ *         execution:
  *           type: string
  *         botName:
  *           type: string
- *         execution:
+ *           example: eligibility-bot
+ *         scheduledAt:
  *           type: string
- *         playwrightMode:
- *           type: string
- *           enum: [serial, default, parallel]
- *         workers:
- *           type: integer
- *           minimum: 1
- *         retries:
- *           type: integer
- *           minimum: 0
- *         headed:
- *           type: boolean
- *         meta:
+ *           format: date-time
+ *           example: 2026-06-03T15:52:00.000Z
+ *         context:
  *           type: object
- *           required: [bot, patients, config, rv]
+ *           required: [env, bot, clinicConfig, payloadConfigs, patients]
  *           properties:
+ *             env:
+ *               type: string
+ *               enum: [dev, prod]
+ *               example: dev
  *             bot:
  *               $ref: '#/components/schemas/Bot'
+ *             clinicConfig:
+ *               type: object
+ *               additionalProperties: true
+ *             payloadConfigs:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 additionalProperties: true
  *             patients:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Patient'
- *             config:
- *               type: object
- *               additionalProperties: true
- *             rv:
- *               type: object
- *               additionalProperties: true
- *             outputPath:
- *               type: string
- *             logsPath:
- *               type: string
  *             workers:
  *               type: integer
  *               minimum: 1
+ *               example: 1
  *             retries:
  *               type: integer
  *               minimum: 0
+ *               example: 0
  *             headed:
  *               type: boolean
- *             playwrightMode:
- *               type: string
- *               enum: [serial, default, parallel]
+ *               example: false
  *     Execution:
  *       type: object
  *       properties:
@@ -252,16 +205,17 @@ router.post('/executions', createExecution);
  *           example:
  *             project: elg-regression
  *             scheduledAt: 2026-06-03T15:52:00.000Z
- *             meta:
+ *             context:
+ *               env: dev
  *               bot:
  *                 botName: eligibility-bot
  *                 targetUrl: https://portal.example.com
  *                 username: runner_user
  *                 password: runner_password
  *                 otherInformation: {}
+ *               clinicConfig: {}
+ *               payloadConfigs: []
  *               patients: []
- *               config: {}
- *               rv: {}
  *     responses:
  *       200:
  *         description: Execution scheduled successfully

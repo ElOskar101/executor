@@ -37,7 +37,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-
     environment:
       REPORTS_PATH: /app/reports
       NODE_ENV: production

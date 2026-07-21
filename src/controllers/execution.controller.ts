@@ -26,7 +26,7 @@ export const createExecution = async (req: Request, res: Response) => {
             return onBadRequest("Project is required", res);
         }
         logger.info(
-            `User requested execution for project=${payload.project} patients=${payload.context.patients.length}`,
+            `User requested execution for project=${payload.project} patients=${Array(payload.context?.patients).length}`,
         );
         const execution = await createQueuedExecution(payload);
         onSuccess(execution, res);

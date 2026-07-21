@@ -47,22 +47,25 @@ const ExecutionSchema = new Schema({
     clinic: { type: String },
     execution: { type: String},
     botName: { type: String },
+    accessToken: {type: String},
     // Playwright execution properties needed for playwright project runtime. It is like runtime context
     // (Runtime context for execution in playwright)
-    context:{
+    context: {
         type: {
-            bot: { type: bot, required: true },
-            patients: { type: [patient], required: true },
             executionId: {type: String},
-            accessToken: {type: String},
-            apiUrl:{type: String},
-            config:{type: Schema.Types.Mixed, default:{}, required: true},
-            rv:{type: Schema.Types.Mixed, default:{}, required: true},
-            outputPath: {type:String},
-            logsPath: {type:String},
+            env: {type: String, enum:['dev', 'prod'], required:true, default: 'dev'},
+            bot: { type: Schema.Types.Mixed, required: true },
+            patients: [{ type: Schema.Types.Mixed, required: true }],
+            //accessToken: {type: String},
+            //apiUrl:{type: String},
+            clinicConfig:{type: Schema.Types.Mixed, default:{}, required: true},
+            //rv:{type: Schema.Types.Mixed, default:{}, required: true},
+            payloadConfigs:[{type: Schema.Types.Mixed, default:{}, required: true}],
+            //outputPath: {type:String},
+            //logsPath: {type:String},
             workers: {type:Number, default:1},
             retries: {type:Number, default:0},
-            headed:{type:Boolean, default:false},
+            //headed:{type:Boolean, default:false},
         },
         required: true,
     }

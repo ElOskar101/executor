@@ -80,7 +80,6 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
         workers,
         retries,
         headed,
-        //playwrightFolder,
         context: normalizedContext,
     };
 

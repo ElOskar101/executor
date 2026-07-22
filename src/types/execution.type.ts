@@ -20,7 +20,6 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     execution?: string;
     botName?: string;
     scheduledAt?: Date;
-    accessToken?: string;
     context: Record<string, unknown> //Context;
 }
 
@@ -30,12 +29,12 @@ export interface ExecutionJobData {
     workers: number;
     retries: number;
     headed: boolean;
-    //playwrightFolder: string;
     context: Record<string, unknown>; //Context;
 }
 
 export interface Context {
     executionId?: string;
+    accessToken?: string;
     env: Env;
     bot: Record<string, unknown>,
     clinicConfig: Record<string, unknown>

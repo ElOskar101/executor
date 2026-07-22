@@ -4,75 +4,47 @@ content-type: application/json
 
 {
   "project": "liberty",
-  "createdBy": "Oscar",
-  "client": "Salt Dental Partners",
-  "clinic": "Smile For Kids ",
+  "createdBy": "Fabian Montoya",
+  "client": "Carriers Testing",
+  "clinic": "Carrier testing clinic",
+  "execution": "2026-07-13",
   "botName": "Liberty Dental Plan",
   "context": {
+    "env": "dev",
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNTdmZWRjMzg2ZTgyMWUzZDcxZDBkOSIsImlhdCI6MTc4MzQ2MjM1OSwiZXhwIjoxNzg2MDU0MzU5fQ.BEwqLiIH8e0Ov0ukhvmsaHoz1ARjU_xAZDCBKpfHQZ0",
     "bot": {
+      "id": "622f7ce13ccdc854030a3bf4",
       "botName": "Liberty Dental Plan",
       "targetUrl": "https://providerportal.libertydentalplan.com",
-      "username": "71stDepot",
-      "password": "Dental1234!",
-      "otherInformation": {
-        "specifyPayer": "None"
-      }
+      "username": "GrandDR",
+      "password": "Gr@nd2026!",
+      "otherInformation": {}
     },
+    "clinicConfig": {},
+    "payloadConfigs": [],
+    "executionId": "6a554809f15b03d0ad27fb4d",
     "patients": [
       {
-        "id": "69e271a8ea737392921aaa29",
-        "patientName": {
-          "key": "patient_name",
-          "value": "Ana"
-        },
-        "patientLastName": {
-          "key": "1",
-          "value": "Lopez"
-        },
-        "patientMemberId": {
-          "key": "2",
-          "value": "035351523"
-        },
-        "patientDob": {
-          "key": "3",
-          "value": "1985-03-10"
-        },
-        "policyHolderName":{
-          "key": "4",
-          "value": "Ana"
-        },
-        "policyHolderLastName": {
-          "key": "g",
-          "value": "Lopez"
-        },
-        "policyHolderDob": {
-          "key": "5",
-          "value": "1985-03-10"
-        },
-        "relationship": {
-          "key": "6",
-          "value": "self"
-        },
-        "zipCode": {
-          "key": "7",
-          "value": "90001"
-        },
-        "verificationType": "elg",
-        "filenames": ["ana-lopez.pdf"],
-        "otherInformation": {
-          "plan": "Gold"
+        "id": "6a5ab932bd1b49672ac353f6",
+        "patientDob": "01/15/1990",
+        "patientLastName": "Doe",
+        "subscriberDob": "01/15/1990",
+        "subscriberName": "Jane Doe",
+        "patientName": "Jane",
+        "subscriberLastName": "Doe",
+        "fileNames": {
+          "fullForm": null,
+          "shortForm": null,
+          "claimsForm": null,
+          "eligibilityPrint": null,
+          "historyPrint": null,
+          "claimsPrint": null,
+          "otherDocuments": []
         }
       }
     ],
-    "config": {},
-    "rv": {},
-    "outputPath": "/tmp/reports",
-    "logsPath": "/tmp/logs",
     "workers": 2,
-    "retries": 1,
-    "executionId": "69e271a8ea737392921aaa28",
-    "apiUrl": "https://dev-carrier.dentalautomation.ai/",
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMmY3OTI2M2NjZGM4NTQwMzBhMzk5OSIsImlhdCI6MTc4MjI0MzIxNiwiZXhwIjoxNzg0ODM1MjE2fQ.WPiCY0kemzD7_iqbFz2lRyXkOO2dCfvEEZ3opEnMnl4"
+    "retries": 1
   }
 }
 

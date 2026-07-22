@@ -20,6 +20,7 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     execution?: string;
     botName?: string;
     scheduledAt?: Date;
+    accessToken?: string;
     context: Record<string, unknown> //Context;
 }
 

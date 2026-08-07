@@ -1,7 +1,7 @@
 ### GET request to example server
 @localServer=http://localhost:3017
 @server=api.controlcentralcarrier.com
-POST {{server}}/api/v1/executions/
+POST {{localServer}}/api/v1/executions/
 content-type: application/json
 
 {

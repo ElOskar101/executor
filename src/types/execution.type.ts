@@ -21,6 +21,9 @@ export interface CreateExecutionRequest {// Only for http request. It is basical
     botName?: string;
     scheduledAt?: Date;
     context: Record<string, unknown> //Context;
+    retries?: number;
+    headed?: boolean;
+    workers?: number;
 }
 
 export interface ExecutionJobData {

@@ -1,6 +1,5 @@
 import {Job} from "bullmq";
 
-import {assertAllowedPlaywrightProject, getPlaywrightRootFolder} from "../configs/playwright.config";
 import {ExecutionModel} from "../models/execution.model";
 import {getExecutionQueue} from "../queues/execution.queue";
 import {CreateExecutionRequest, ExecutionJobData, ExecutionStatus} from "../types/execution.type";
@@ -54,7 +53,7 @@ async function enqueueExecution(payload: CreateExecutionRequest, status: Executi
     //const playwrightFolder = getPlaywrightRootFolder(); Support for bare implementation remove if needed
     const workers = normalizePositiveInteger(payload.context.workers, DEFAULT_WORKERS, Number(process.env.MAX_PLAYWRIGHT_WORKERS || 10));
     const retries = normalizeRetries(payload.context.retries);
-    const headed = Boolean(payload.context.headed);
+    const headed = Boolean(payload.context);
     const normalizedContext = {
         ...payload.context,
         workers,

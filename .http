@@ -1,52 +1,92 @@
 ### GET request to example server
-POST http://localhost:3017/api/v1/executions/
+@localServer=http://localhost:3017
+@server=api.controlcentralcarrier.com
+POST {{server}}/api/v1/executions/
 content-type: application/json
 
 {
-  "project": "liberty",
-  "createdBy": "Fabian Montoya",
+  "project": "metlife",
+  "createdBy": "Oscar Gonzalez",
   "client": "Carriers Testing",
   "clinic": "Carrier testing clinic",
   "execution": "2026-07-13",
-  "botName": "Liberty Dental Plan",
+  "botName": "metlife",
   "context": {
-    "env": "dev",
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNTdmZWRjMzg2ZTgyMWUzZDcxZDBkOSIsImlhdCI6MTc4MzQ2MjM1OSwiZXhwIjoxNzg2MDU0MzU5fQ.BEwqLiIH8e0Ov0ukhvmsaHoz1ARjU_xAZDCBKpfHQZ0",
-    "bot": {
-      "id": "622f7ce13ccdc854030a3bf4",
-      "botName": "Liberty Dental Plan",
-      "targetUrl": "https://providerportal.libertydentalplan.com",
-      "username": "GrandDR",
-      "password": "Gr@nd2026!",
-      "otherInformation": {}
+  "executionId": "",
+  "env": "dev",
+  "bot": {
+    "botName": "metlife",
+    "targetUrl": "https://dentalprovider.metlife.com/claims",
+    "username": "CharlySmith1",
+    "password": "CoralGables2508.@",
+    "otherInformation": {
+      "mfaEmail": "petitsmiles1@rcmexperts.net"
+    }
+  },
+  "clinicConfig": {
+    "clientName": "MiCliente",
+    "clinicName": "MiClinica",
+    "fbdConfig": 6,
+    "elgConfig": 1,
+    "inNetwork": true,
+    "shortForm": false,
+    "claimsForm": true,
+    "defaultEnable": 1
+  },
+  "payloadConfigs": [
+    { "1": {} },
+    { "6": {} }
+  ],
+  "patients": [
+    {
+      "id": "",
+      "patientName": "Noah",
+      "patientLastName": "Clabiorne",
+      "patientMemberId": "member_id",
+      "patientDob": "01/01/1990",
+      "policyHolderName": "Alejandro",
+      "policyHolderLastName": "Clabiorne",
+      "policyHolderDob": "01/01/1980",
+      "relationship": "Self",
+      "zipCode": "33143",
+      "verificationType": "eob",
+      "dateOfService": "06/26/2026",
+      "fileNames": {
+        "eobPrint": "eob_test.pdf",
+        "otherDocuments": []
+      },
+      "additionalInfo1": "",
+      "additionalInfo2": "",
+      "additionalInfo3": ""
     },
-    "clinicConfig": {},
-    "payloadConfigs": [],
-    "executionId": "6a554809f15b03d0ad27fb4d",
-    "patients": [
-      {
-        "id": "6a5ab932bd1b49672ac353f6",
-        "patientDob": "01/15/1990",
-        "patientLastName": "Doe",
-        "subscriberDob": "01/15/1990",
-        "subscriberName": "Jane Doe",
-        "patientName": "Jane",
-        "subscriberLastName": "Doe",
-        "fileNames": {
-          "fullForm": null,
-          "shortForm": null,
-          "claimsForm": null,
-          "eligibilityPrint": null,
-          "historyPrint": null,
-          "claimsPrint": null,
-          "otherDocuments": []
-        }
-      }
-    ],
-    "workers": 2,
-    "retries": 1
-  }
+    {
+      "id": "",
+      "patientName": "Milena",
+      "patientLastName": "Arthur",
+      "patientMemberId": "member_id",
+      "patientDob": "01/01/1990",
+      "policyHolderName": "Eduardo",
+      "policyHolderLastName": "Arthur",
+      "policyHolderDob": "01/01/1980",
+      "relationship": "Self",
+      "zipCode": "33143",
+      "verificationType": "eob",
+      "dateOfService": "05/01/2026",
+      "fileNames": {
+        "eobPrint": "eob_test.pdf",
+        "otherDocuments": []
+      },
+      "additionalInfo1": "",
+      "additionalInfo2": "",
+      "additionalInfo3": ""
+    }
+  ],
+  "workers": 2,
+  "retries": 1,
+  "headed": true
 }
+}
+
 
 ### GET request to example server
 GET http://localhost:3017/api/v1/stats

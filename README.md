@@ -19,6 +19,10 @@ Cliente / Dashboard
   -> Playwright / browser automation
 ```
 
+Referencia general de la arquitectura del ecosistema donde este proyecto pertenece:
+
+![Referencia general de arquitectura](docs/fb85ba63-e0f7-4047-8216-8dc9ac93651b.svg)
+
 - MongoDB guarda el estado y metadata de cada ejecución.
 - Redis administra la cola de jobs y eventos en tiempo real.
 - Socket.io expone eventos de logs y estado al cliente.

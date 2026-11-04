@@ -4,6 +4,7 @@ import {connectDb} from "./connection.db";
 import app from './app';
 import { setupSocketServer, closeSocketServer } from './services/socket-server.service';
 import {closeExecutionQueue} from './queues/execution.queue';
+import {closeRowAuditQueue} from './queues/row-audit.queue';
 import { closeRealtimePublisher } from './services/realtime.service';
 import { startReportCleanupCron } from './crons/report-cleaner.cron';
 import { createLogger } from './libs/logger';
@@ -40,6 +41,8 @@ connectDb()
             logger.info('Socket.io server closed');
             await closeExecutionQueue();
             logger.info('Execution queue closed');
+            await closeRowAuditQueue();
+            logger.info('Row audit queue closed');
             await closeRealtimePublisher();
             logger.info('Realtime publisher closed');
             reportCleanupTask.stop();

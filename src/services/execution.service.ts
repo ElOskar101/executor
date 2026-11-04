@@ -47,7 +47,7 @@ export async function createScheduledExecution(payload: CreateExecutionRequest) 
     return enqueueExecution(payload, "scheduled", delay, scheduledAtDate);
 }
 
-async function enqueueExecution(payload: CreateExecutionRequest, status: ExecutionStatus, delay = 0, scheduledAt?: Date) {
+    async function enqueueExecution(payload: CreateExecutionRequest, status: ExecutionStatus, delay = 0, scheduledAt?: Date) {
     //assertAllowedPlaywrightProject(payload.project); enable only if you want to validate allowed projects
 
     //const playwrightFolder = getPlaywrightRootFolder(); Support for bare implementation remove if needed

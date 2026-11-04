@@ -93,52 +93,1816 @@ GET http://localhost:3017/api/v1/stats
 content-type: application/json
 
 ### GET request to example server
-POST https://api.controlcentralcarrier.com/api/v1/executions
+POST http://localhost:3017/api/v1/row-audit
 content-type: application/json
 
 {
-  "project": "liberty",
-  "createdBy": "Oscar Gonzalez", // (opcional)
-  "client": "Salt Dental Partners", // (opcional)
-  "clinic": "Smile For Kids ", // (opcional)
-  "botName": "Liberty Dental Plan", // (opcional)
-  "meta": {
-    "bot": {
-      "botName": "Liberty Dental Plan",
-      "targetUrl": "https://providerportal.libertydentalplan.com",
-      "username": "71stDepot",
-      "password": "Dental1234!",
-      "otherInformation": {
-        "specifyPayer": "None"
-      }
+  "row":{
+    "audited": "",
+    "loaded": false,
+    "executed": true,
+    "readyToReview": false,
+    "executionStatus": "active",
+    "storedFiles": [
+      "palos-smiles/october 2026/ACTIVE_David_Riojas.pdf"
+    ],
+    "formPayload": {},
+    "bot": "631f530e8c47e3e1659a49b3",
+    "cells": {
+      "patientName": "David",
+      "patientLastName": "Riojas",
+      "patientDob": "12/20/1998",
+      "memberId": "1234",
+      "verificationType": "FBD",
+      "subscriberFirstName": "David",
+      "subscriberLastName": "Riojas",
+      "subscriberDob": "123",
+      "relationship": "Self"
     },
-    "patients": [
+    "_id": "6ae0ce3ae5a29b5b07753647"
+  },
+  "template": {
+    "anchors": [
       {
-        "patientName": "Ana",
-        "patientLastName": "Lopez",
-        "patientMemberId": "A10001",
-        "patientDob": "1985-03-10",
-        "policyHolderName": "Ana",
-        "policyHolderLastName": "Lopez",
-        "policyHolderDob": "1985-03-10",
-        "relationship": "self",
-        "zipCode": "90001",
-        "clinic": "Downtown Clinic",
-        "verificationType": "elg",
-        "filenames": "ana-lopez.pdf",
-        "otherInformation": {
-          "plan": "Gold"
-        }
+        "id": "a1",
+        "label": "Page 1",
+        "normalized_text": "page 1",
+        "document_count": 10
+      },
+      {
+        "id": "a2",
+        "label": "Eligibility",
+        "normalized_text": "eligibility",
+        "document_count": 10
+      },
+      {
+        "id": "a3",
+        "label": "Member Name:",
+        "normalized_text": "member name",
+        "document_count": 10
+      },
+      {
+        "id": "a4",
+        "label": "Patient Name:",
+        "normalized_text": "patient name",
+        "document_count": 10
+      },
+      {
+        "id": "a5",
+        "label": "Relationship:",
+        "normalized_text": "relationship",
+        "document_count": 10
+      },
+      {
+        "id": "a6",
+        "label": "Client Name:",
+        "normalized_text": "client name",
+        "document_count": 10
+      },
+      {
+        "id": "a7",
+        "label": "Client Number:",
+        "normalized_text": "client number",
+        "document_count": 10
+      },
+      {
+        "id": "a8",
+        "label": "Product:",
+        "normalized_text": "product",
+        "document_count": 10
+      },
+      {
+        "id": "a9",
+        "label": "Currently Eligible:",
+        "normalized_text": "currently eligible",
+        "document_count": 10
+      },
+      {
+        "id": "a10",
+        "label": "Claims Mailing Address",
+        "normalized_text": "claims mailing address",
+        "document_count": 10
+      },
+      {
+        "id": "a11",
+        "label": "Delta Dental",
+        "normalized_text": "delta dental",
+        "document_count": 10
+      },
+      {
+        "id": "a12",
+        "label": "Payer ID",
+        "normalized_text": "payer id",
+        "document_count": 10
+      },
+      {
+        "id": "a13",
+        "label": "DDPMI, DDPIN, DDPOH",
+        "normalized_text": "ddpmi ddpin ddpoh",
+        "document_count": 10
+      },
+      {
+        "id": "a14",
+        "label": "Client Information:",
+        "normalized_text": "client information",
+        "document_count": 10
+      },
+      {
+        "id": "a15",
+        "label": "Coordination of Benefits",
+        "normalized_text": "coordination of benefits",
+        "document_count": 10
+      },
+      {
+        "id": "a16",
+        "label": "Internal:",
+        "normalized_text": "internal",
+        "document_count": 10
+      },
+      {
+        "id": "a17",
+        "label": "External:",
+        "normalized_text": "external",
+        "document_count": 10
+      },
+      {
+        "id": "a18",
+        "label": "Be sure to visit us at",
+        "normalized_text": "be sure to visit us at",
+        "document_count": 10
+      },
+      {
+        "id": "a19",
+        "label": "to submit claims and",
+        "normalized_text": "to submit claims and",
+        "document_count": 10
+      },
+      {
+        "id": "a20",
+        "label": "review benefits.",
+        "normalized_text": "review benefits",
+        "document_count": 10
+      },
+      {
+        "id": "a21",
+        "label": "Office Visit",
+        "normalized_text": "office visit",
+        "document_count": 10
+      },
+      {
+        "id": "a22",
+        "label": "Exam",
+        "normalized_text": "exam",
+        "document_count": 10
+      },
+      {
+        "id": "a23",
+        "label": "Adult Cleaning",
+        "normalized_text": "adult cleaning",
+        "document_count": 10
+      },
+      {
+        "id": "a24",
+        "label": "Child Cleaning",
+        "normalized_text": "child cleaning",
+        "document_count": 10
+      },
+      {
+        "id": "a25",
+        "label": "Perio Maintenance Cleaning",
+        "normalized_text": "perio maintenance cleaning",
+        "document_count": 10
+      },
+      {
+        "id": "a26",
+        "label": "Bitewings",
+        "normalized_text": "bitewings",
+        "document_count": 10
+      },
+      {
+        "id": "a27",
+        "label": "Full Mouth X-rays",
+        "normalized_text": "full mouth x rays",
+        "document_count": 10
+      },
+      {
+        "id": "a28",
+        "label": "Fluoride",
+        "normalized_text": "fluoride",
+        "document_count": 10
+      },
+      {
+        "id": "a29",
+        "label": "Occlusal Guard",
+        "normalized_text": "occlusal guard",
+        "document_count": 10
+      },
+      {
+        "id": "a30",
+        "label": "Benefit Breakdown",
+        "normalized_text": "benefit breakdown",
+        "document_count": 9
+      },
+      {
+        "id": "a31",
+        "label": "Dependent",
+        "normalized_text": "dependent",
+        "document_count": 7
+      },
+      {
+        "id": "a32",
+        "label": "Maximum",
+        "normalized_text": "maximum",
+        "document_count": 9
+      },
+      {
+        "id": "a33",
+        "label": "applies to",
+        "normalized_text": "applies to",
+        "document_count": 9
+      },
+      {
+        "id": "a34",
+        "label": "Benefit Periods",
+        "normalized_text": "benefit periods",
+        "document_count": 9
+      },
+      {
+        "id": "a35",
+        "label": "Payment was issued on",
+        "normalized_text": "payment was issued on",
+        "document_count": 7
+      },
+      {
+        "id": "a36",
+        "label": "indicated below.",
+        "normalized_text": "indicated below",
+        "document_count": 6
+      },
+      {
+        "id": "a37",
+        "label": "No",
+        "normalized_text": "no",
+        "document_count": 6
       }
     ],
-    "config": {},
-    "rv": {},
-    "outputPath": "/tmp/reports", // (opcional)
-    "logsPath": "/tmp/logs", // (opcional)
-    "workers": 2, // (opcional)
-    "retries": 1, // (opcional)
-    "playwrightMode": "parallel" // (opcional)
+    "visual_elements": [
+      {
+        "id": "v1",
+        "kind": "image",
+        "identity": {
+          "digest": "d54bc2a50cd4d1766b7a38fc497e1832"
+        },
+        "document_count": 10,
+        "common_count": 1
+      }
+    ],
+    "graph": {
+      "nodes": [
+        {
+          "id": "n1",
+          "kind": "text",
+          "anchor_id": "a2",
+          "normalized_text": "eligibility",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l0-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            65.18099975585938,
+            57.85800552368164,
+            77.64599609375
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n2",
+          "kind": "text",
+          "anchor_id": "a3",
+          "normalized_text": "member name",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l1-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            74.0999984741211,
+            76.5780029296875,
+            86.10599517822266
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n3",
+          "kind": "text",
+          "anchor_id": "a4",
+          "normalized_text": "patient name",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l3-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            83.0999984741211,
+            71.08799743652344,
+            95.10599517822266
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n4",
+          "kind": "text",
+          "anchor_id": "a5",
+          "normalized_text": "relationship",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l5-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            92.0999984741211,
+            67.8479995727539,
+            104.10599517822266
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n5",
+          "kind": "text",
+          "anchor_id": "a31",
+          "normalized_text": "dependent",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l6-s0"
+          },
+          "bbox": [
+            109.84199523925781,
+            92.0999984741211,
+            148.8300018310547,
+            104.10599517822266
+          ],
+          "frequency": 0.7,
+          "weight_factor": 0.8,
+          "weight": 0.5599999999999999
+        },
+        {
+          "id": "n6",
+          "kind": "text",
+          "anchor_id": "a6",
+          "normalized_text": "client name",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l7-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            101.0999984741211,
+            68.09100341796875,
+            113.10599517822266
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n7",
+          "kind": "text",
+          "anchor_id": "a7",
+          "normalized_text": "client number",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l9-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            110.0999984741211,
+            76.09201049804688,
+            122.10599517822266
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n8",
+          "kind": "text",
+          "anchor_id": "a8",
+          "normalized_text": "product",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l11-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            119.0999984741211,
+            50.34299850463867,
+            131.1060028076172
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n9",
+          "kind": "text",
+          "anchor_id": "a9",
+          "normalized_text": "currently eligible",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b2-l13-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            128.09999084472656,
+            87.593994140625,
+            140.1060028076172
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n10",
+          "kind": "text",
+          "anchor_id": "a10",
+          "normalized_text": "claims mailing address",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b3-l0-s0"
+          },
+          "bbox": [
+            328.8919982910156,
+            65.18099975585938,
+            421.89801025390625,
+            77.64599609375
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n11",
+          "kind": "text",
+          "anchor_id": "a11",
+          "normalized_text": "delta dental",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b3-l3-s0"
+          },
+          "bbox": [
+            394.7080078125,
+            83.0999984741211,
+            440.446044921875,
+            95.10599517822266
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n12",
+          "kind": "text",
+          "anchor_id": "a12",
+          "normalized_text": "payer id",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b3-l9-s0"
+          },
+          "bbox": [
+            328.8919982910156,
+            119.18099975585938,
+            363.6319885253906,
+            131.64599609375
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n13",
+          "kind": "text",
+          "anchor_id": "a13",
+          "normalized_text": "ddpmi ddpin ddpoh",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b3-l10-s0"
+          },
+          "bbox": [
+            394.7080078125,
+            119.0999984741211,
+            491.197021484375,
+            131.1060028076172
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n14",
+          "kind": "text",
+          "anchor_id": "a14",
+          "normalized_text": "client information",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b4-l0-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            142.10000610351562,
+            89.59199523925781,
+            154.10601806640625
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n15",
+          "kind": "text",
+          "anchor_id": "a15",
+          "normalized_text": "coordination of benefits",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b5-l0-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            165.2030029296875,
+            114.34200286865234,
+            177.66799926757812
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n16",
+          "kind": "text",
+          "anchor_id": "a16",
+          "normalized_text": "internal",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b5-l1-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            174.10000610351562,
+            50.33399963378906,
+            186.10601806640625
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n17",
+          "kind": "text",
+          "anchor_id": "a37",
+          "normalized_text": "no",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b5-l2-s0"
+          },
+          "bbox": [
+            109.84199523925781,
+            174.10000610351562,
+            120.83999633789062,
+            186.10601806640625
+          ],
+          "frequency": 0.6,
+          "weight_factor": 0.8,
+          "weight": 0.48
+        },
+        {
+          "id": "n18",
+          "kind": "text",
+          "anchor_id": "a17",
+          "normalized_text": "external",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b5-l3-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            183.10000610351562,
+            52.83599853515625,
+            195.10601806640625
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n19",
+          "kind": "text",
+          "anchor_id": "a18",
+          "normalized_text": "be sure to visit us at",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b6-l0-s0"
+          },
+          "bbox": [
+            328.8919982910156,
+            174.10000610351562,
+            404.39300537109375,
+            186.10601806640625
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n20",
+          "kind": "text",
+          "anchor_id": "a19",
+          "normalized_text": "to submit claims and",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b6-l0-s2"
+          },
+          "bbox": [
+            494.88800048828125,
+            174.10000610351562,
+            571.8920288085938,
+            186.10601806640625
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n21",
+          "kind": "text",
+          "anchor_id": "a20",
+          "normalized_text": "review benefits",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b6-l1-s0"
+          },
+          "bbox": [
+            328.8919982910156,
+            183.10000610351562,
+            386.375,
+            195.10601806640625
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n22",
+          "kind": "text",
+          "anchor_id": "a32",
+          "normalized_text": "maximum",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b9-l4-s0"
+          },
+          "bbox": [
+            22.841999053955078,
+            262.4530029296875,
+            62.83800506591797,
+            274.9179992675781
+          ],
+          "frequency": 0.9,
+          "weight_factor": 1.0,
+          "weight": 0.9
+        },
+        {
+          "id": "n23",
+          "kind": "text",
+          "anchor_id": "a33",
+          "normalized_text": "applies to",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b10-l1-s0"
+          },
+          "bbox": [
+            288.625,
+            306.10003662109375,
+            323.3740234375,
+            318.10601806640625
+          ],
+          "frequency": 0.9,
+          "weight_factor": 0.8,
+          "weight": 0.7200000000000001
+        },
+        {
+          "id": "n24",
+          "kind": "text",
+          "anchor_id": "a34",
+          "normalized_text": "benefit periods",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b10-l2-s0"
+          },
+          "bbox": [
+            506.25201416015625,
+            306.10003662109375,
+            561.9979858398438,
+            318.10601806640625
+          ],
+          "frequency": 0.9,
+          "weight_factor": 0.8,
+          "weight": 0.7200000000000001
+        },
+        {
+          "id": "n25",
+          "kind": "text",
+          "anchor_id": "a33",
+          "normalized_text": "applies to",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b12-l1-s0"
+          },
+          "bbox": [
+            288.625,
+            415.35003662109375,
+            323.3740234375,
+            427.35601806640625
+          ],
+          "frequency": 0.9,
+          "weight_factor": 0.8,
+          "weight": 0.7200000000000001
+        },
+        {
+          "id": "n26",
+          "kind": "text",
+          "anchor_id": "a34",
+          "normalized_text": "benefit periods",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b12-l2-s0"
+          },
+          "bbox": [
+            506.25201416015625,
+            415.35003662109375,
+            561.9979858398438,
+            427.35601806640625
+          ],
+          "frequency": 0.9,
+          "weight_factor": 0.8,
+          "weight": 0.7200000000000001
+        },
+        {
+          "id": "n27",
+          "kind": "text",
+          "anchor_id": "a21",
+          "normalized_text": "office visit",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b14-l0-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            482.2030029296875,
+            63.582000732421875,
+            494.6679992675781
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        },
+        {
+          "id": "n28",
+          "kind": "text",
+          "anchor_id": "a22",
+          "normalized_text": "exam",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b16-l0-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            508.10003662109375,
+            49.83899688720703,
+            520.1060180664062
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n29",
+          "kind": "text",
+          "anchor_id": "a23",
+          "normalized_text": "adult cleaning",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b16-l2-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            521.0999755859375,
+            84.09300231933594,
+            533.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n30",
+          "kind": "text",
+          "anchor_id": "a24",
+          "normalized_text": "child cleaning",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b16-l4-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            534.0999755859375,
+            83.59800720214844,
+            546.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n31",
+          "kind": "text",
+          "anchor_id": "a25",
+          "normalized_text": "perio maintenance cleaning",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b16-l6-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            547.0999755859375,
+            131.32501220703125,
+            559.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n32",
+          "kind": "text",
+          "anchor_id": "a26",
+          "normalized_text": "bitewings",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b17-l0-s0"
+          },
+          "bbox": [
+            314.0,
+            508.10003662109375,
+            350.5039978027344,
+            520.1060180664062
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n33",
+          "kind": "text",
+          "anchor_id": "a37",
+          "normalized_text": "no",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b17-l1-s0"
+          },
+          "bbox": [
+            450.2079772949219,
+            508.10003662109375,
+            461.20599365234375,
+            520.1060180664062
+          ],
+          "frequency": 0.6,
+          "weight_factor": 0.8,
+          "weight": 0.48
+        },
+        {
+          "id": "n34",
+          "kind": "text",
+          "anchor_id": "a35",
+          "normalized_text": "payment was issued on",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b17-l2-s0"
+          },
+          "bbox": [
+            479.093994140625,
+            508.10003662109375,
+            562.8389892578125,
+            520.1060180664062
+          ],
+          "frequency": 0.7,
+          "weight_factor": 0.8,
+          "weight": 0.5599999999999999
+        },
+        {
+          "id": "n35",
+          "kind": "text",
+          "anchor_id": "a27",
+          "normalized_text": "full mouth x rays",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b17-l4-s0"
+          },
+          "bbox": [
+            314.0,
+            530.0999755859375,
+            381.5000305175781,
+            542.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n36",
+          "kind": "text",
+          "anchor_id": "a28",
+          "normalized_text": "fluoride",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b17-l6-s0"
+          },
+          "bbox": [
+            314.0,
+            543.0999755859375,
+            344.5010070800781,
+            555.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n37",
+          "kind": "text",
+          "anchor_id": "a29",
+          "normalized_text": "occlusal guard",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b17-l8-s0"
+          },
+          "bbox": [
+            314.0,
+            556.0999755859375,
+            370.23199462890625,
+            568.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n38",
+          "kind": "text",
+          "anchor_id": "a22",
+          "normalized_text": "exam",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b19-l0-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            590.0999755859375,
+            49.83899688720703,
+            602.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n39",
+          "kind": "text",
+          "anchor_id": "a23",
+          "normalized_text": "adult cleaning",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b19-l2-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            603.0999755859375,
+            84.09300231933594,
+            615.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n40",
+          "kind": "text",
+          "anchor_id": "a24",
+          "normalized_text": "child cleaning",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b19-l4-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            616.0999755859375,
+            83.59800720214844,
+            628.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n41",
+          "kind": "text",
+          "anchor_id": "a25",
+          "normalized_text": "perio maintenance cleaning",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b19-l6-s0"
+          },
+          "bbox": [
+            28.841999053955078,
+            629.0999755859375,
+            131.32501220703125,
+            641.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n42",
+          "kind": "text",
+          "anchor_id": "a26",
+          "normalized_text": "bitewings",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b20-l0-s0"
+          },
+          "bbox": [
+            314.0,
+            590.0999755859375,
+            350.5039978027344,
+            602.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n43",
+          "kind": "text",
+          "anchor_id": "a37",
+          "normalized_text": "no",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b20-l1-s0"
+          },
+          "bbox": [
+            450.2079772949219,
+            590.0999755859375,
+            461.20599365234375,
+            602.10595703125
+          ],
+          "frequency": 0.6,
+          "weight_factor": 0.8,
+          "weight": 0.48
+        },
+        {
+          "id": "n44",
+          "kind": "text",
+          "anchor_id": "a35",
+          "normalized_text": "payment was issued on",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b20-l2-s0"
+          },
+          "bbox": [
+            479.093994140625,
+            590.0999755859375,
+            562.8389892578125,
+            602.10595703125
+          ],
+          "frequency": 0.7,
+          "weight_factor": 0.8,
+          "weight": 0.5599999999999999
+        },
+        {
+          "id": "n45",
+          "kind": "text",
+          "anchor_id": "a27",
+          "normalized_text": "full mouth x rays",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b20-l4-s0"
+          },
+          "bbox": [
+            314.0,
+            612.0999755859375,
+            381.5000305175781,
+            624.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n46",
+          "kind": "text",
+          "anchor_id": "a28",
+          "normalized_text": "fluoride",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b20-l6-s0"
+          },
+          "bbox": [
+            314.0,
+            625.0999755859375,
+            344.5010070800781,
+            637.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n47",
+          "kind": "text",
+          "anchor_id": "a29",
+          "normalized_text": "occlusal guard",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b20-l8-s0"
+          },
+          "bbox": [
+            314.0,
+            638.0999755859375,
+            370.23199462890625,
+            650.10595703125
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n48",
+          "kind": "text",
+          "anchor_id": "a30",
+          "normalized_text": "benefit breakdown",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b21-l0-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            655.2030029296875,
+            94.09201049804688,
+            667.66796875
+          ],
+          "frequency": 0.9,
+          "weight_factor": 1.0,
+          "weight": 0.9
+        },
+        {
+          "id": "n49",
+          "kind": "text",
+          "anchor_id": "a36",
+          "normalized_text": "indicated below",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b23-l1-s0"
+          },
+          "bbox": [
+            19.841999053955078,
+            720.4199829101562,
+            72.72200012207031,
+            731.0919799804688
+          ],
+          "frequency": 0.6,
+          "weight_factor": 0.8,
+          "weight": 0.48
+        },
+        {
+          "id": "n50",
+          "kind": "text",
+          "anchor_id": "a1",
+          "normalized_text": "page 1",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "box_id": "b24-l1-s0"
+          },
+          "bbox": [
+            291.0149841308594,
+            760.7739868164062,
+            315.260986328125,
+            772.7799682617188
+          ],
+          "frequency": 1.0,
+          "weight_factor": 0.8,
+          "weight": 0.8
+        },
+        {
+          "id": "n51",
+          "kind": "image",
+          "visual_element_id": "v1",
+          "source": {
+            "document_id": "pdf-03",
+            "page": 1,
+            "element_id": "i0"
+          },
+          "bbox": [
+            461.0899963378906,
+            28.59600067138672,
+            580.14501953125,
+            57.64500045776367
+          ],
+          "frequency": 1.0,
+          "weight_factor": 1.0,
+          "weight": 1.0
+        }
+      ],
+      "edges": [
+        {
+          "from": "n1",
+          "relation": "above",
+          "to": "n3",
+          "weight": 1.0
+        },
+        {
+          "from": "n1",
+          "relation": "left_of_same_row",
+          "to": "n10",
+          "weight": 1.0
+        },
+        {
+          "from": "n2",
+          "relation": "above",
+          "to": "n4",
+          "weight": 1.0
+        },
+        {
+          "from": "n2",
+          "relation": "left_of_same_row",
+          "to": "n10",
+          "weight": 1.0
+        },
+        {
+          "from": "n3",
+          "relation": "above",
+          "to": "n6",
+          "weight": 1.0
+        },
+        {
+          "from": "n3",
+          "relation": "left_of_same_row",
+          "to": "n5",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n4",
+          "relation": "above",
+          "to": "n7",
+          "weight": 1.0
+        },
+        {
+          "from": "n4",
+          "relation": "left_of_same_row",
+          "to": "n5",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n5",
+          "relation": "above",
+          "to": "n15",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n5",
+          "relation": "above",
+          "to": "n17",
+          "weight": 0.48
+        },
+        {
+          "from": "n5",
+          "relation": "left_of_same_row",
+          "to": "n11",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n6",
+          "relation": "above",
+          "to": "n8",
+          "weight": 1.0
+        },
+        {
+          "from": "n6",
+          "relation": "left_of_same_row",
+          "to": "n5",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n7",
+          "relation": "above",
+          "to": "n9",
+          "weight": 1.0
+        },
+        {
+          "from": "n7",
+          "relation": "left_of_same_row",
+          "to": "n12",
+          "weight": 1.0
+        },
+        {
+          "from": "n8",
+          "relation": "above",
+          "to": "n14",
+          "weight": 1.0
+        },
+        {
+          "from": "n8",
+          "relation": "left_of_same_row",
+          "to": "n12",
+          "weight": 1.0
+        },
+        {
+          "from": "n9",
+          "relation": "above",
+          "to": "n14",
+          "weight": 1.0
+        },
+        {
+          "from": "n9",
+          "relation": "left_of_same_row",
+          "to": "n12",
+          "weight": 1.0
+        },
+        {
+          "from": "n10",
+          "relation": "above",
+          "to": "n11",
+          "weight": 0.8
+        },
+        {
+          "from": "n10",
+          "relation": "above",
+          "to": "n12",
+          "weight": 1.0
+        },
+        {
+          "from": "n11",
+          "relation": "above",
+          "to": "n13",
+          "weight": 0.8
+        },
+        {
+          "from": "n12",
+          "relation": "above",
+          "to": "n19",
+          "weight": 0.8
+        },
+        {
+          "from": "n12",
+          "relation": "above",
+          "to": "n21",
+          "weight": 0.8
+        },
+        {
+          "from": "n12",
+          "relation": "left_of_same_row",
+          "to": "n13",
+          "weight": 0.8
+        },
+        {
+          "from": "n13",
+          "relation": "above",
+          "to": "n19",
+          "weight": 0.8
+        },
+        {
+          "from": "n13",
+          "relation": "above",
+          "to": "n33",
+          "weight": 0.48
+        },
+        {
+          "from": "n14",
+          "relation": "above",
+          "to": "n15",
+          "weight": 1.0
+        },
+        {
+          "from": "n14",
+          "relation": "above",
+          "to": "n16",
+          "weight": 1.0
+        },
+        {
+          "from": "n15",
+          "relation": "above",
+          "to": "n18",
+          "weight": 1.0
+        },
+        {
+          "from": "n15",
+          "relation": "left_of_same_row",
+          "to": "n19",
+          "weight": 0.8
+        },
+        {
+          "from": "n16",
+          "relation": "above",
+          "to": "n22",
+          "weight": 0.9
+        },
+        {
+          "from": "n16",
+          "relation": "left_of_same_row",
+          "to": "n17",
+          "weight": 0.48
+        },
+        {
+          "from": "n17",
+          "relation": "above",
+          "to": "n31",
+          "weight": 0.48
+        },
+        {
+          "from": "n17",
+          "relation": "left_of_same_row",
+          "to": "n19",
+          "weight": 0.48
+        },
+        {
+          "from": "n17",
+          "relation": "left_of_same_row",
+          "to": "n21",
+          "weight": 0.48
+        },
+        {
+          "from": "n18",
+          "relation": "above",
+          "to": "n22",
+          "weight": 0.9
+        },
+        {
+          "from": "n18",
+          "relation": "left_of_same_row",
+          "to": "n17",
+          "weight": 0.48
+        },
+        {
+          "from": "n19",
+          "relation": "above",
+          "to": "n32",
+          "weight": 0.8
+        },
+        {
+          "from": "n19",
+          "relation": "left_of_same_row",
+          "to": "n20",
+          "weight": 0.8
+        },
+        {
+          "from": "n20",
+          "relation": "above",
+          "to": "n24",
+          "weight": 0.7200000000000001
+        },
+        {
+          "from": "n21",
+          "relation": "above",
+          "to": "n32",
+          "weight": 0.8
+        },
+        {
+          "from": "n21",
+          "relation": "left_of_same_row",
+          "to": "n20",
+          "weight": 0.8
+        },
+        {
+          "from": "n22",
+          "relation": "above",
+          "to": "n27",
+          "weight": 0.9
+        },
+        {
+          "from": "n23",
+          "relation": "above",
+          "to": "n25",
+          "weight": 0.7200000000000001
+        },
+        {
+          "from": "n23",
+          "relation": "left_of_same_row",
+          "to": "n24",
+          "weight": 0.7200000000000001
+        },
+        {
+          "from": "n24",
+          "relation": "above",
+          "to": "n26",
+          "weight": 0.7200000000000001
+        },
+        {
+          "from": "n25",
+          "relation": "above",
+          "to": "n32",
+          "weight": 0.7200000000000001
+        },
+        {
+          "from": "n25",
+          "relation": "left_of_same_row",
+          "to": "n26",
+          "weight": 0.7200000000000001
+        },
+        {
+          "from": "n26",
+          "relation": "above",
+          "to": "n34",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n27",
+          "relation": "above",
+          "to": "n28",
+          "weight": 0.8
+        },
+        {
+          "from": "n28",
+          "relation": "above",
+          "to": "n29",
+          "weight": 0.8
+        },
+        {
+          "from": "n28",
+          "relation": "left_of_same_row",
+          "to": "n32",
+          "weight": 0.8
+        },
+        {
+          "from": "n29",
+          "relation": "above",
+          "to": "n30",
+          "weight": 0.8
+        },
+        {
+          "from": "n29",
+          "relation": "left_of_same_row",
+          "to": "n35",
+          "weight": 0.8
+        },
+        {
+          "from": "n30",
+          "relation": "above",
+          "to": "n31",
+          "weight": 0.8
+        },
+        {
+          "from": "n30",
+          "relation": "left_of_same_row",
+          "to": "n35",
+          "weight": 0.8
+        },
+        {
+          "from": "n31",
+          "relation": "above",
+          "to": "n38",
+          "weight": 0.8
+        },
+        {
+          "from": "n31",
+          "relation": "left_of_same_row",
+          "to": "n36",
+          "weight": 0.8
+        },
+        {
+          "from": "n31",
+          "relation": "left_of_same_row",
+          "to": "n37",
+          "weight": 0.8
+        },
+        {
+          "from": "n32",
+          "relation": "above",
+          "to": "n35",
+          "weight": 0.8
+        },
+        {
+          "from": "n32",
+          "relation": "left_of_same_row",
+          "to": "n33",
+          "weight": 0.48
+        },
+        {
+          "from": "n33",
+          "relation": "above",
+          "to": "n43",
+          "weight": 0.48
+        },
+        {
+          "from": "n33",
+          "relation": "left_of_same_row",
+          "to": "n34",
+          "weight": 0.48
+        },
+        {
+          "from": "n34",
+          "relation": "above",
+          "to": "n44",
+          "weight": 0.5599999999999999
+        },
+        {
+          "from": "n35",
+          "relation": "above",
+          "to": "n36",
+          "weight": 0.8
+        },
+        {
+          "from": "n36",
+          "relation": "above",
+          "to": "n37",
+          "weight": 0.8
+        },
+        {
+          "from": "n37",
+          "relation": "above",
+          "to": "n42",
+          "weight": 0.8
+        },
+        {
+          "from": "n38",
+          "relation": "above",
+          "to": "n39",
+          "weight": 0.8
+        },
+        {
+          "from": "n38",
+          "relation": "left_of_same_row",
+          "to": "n42",
+          "weight": 0.8
+        },
+        {
+          "from": "n39",
+          "relation": "above",
+          "to": "n40",
+          "weight": 0.8
+        },
+        {
+          "from": "n39",
+          "relation": "left_of_same_row",
+          "to": "n45",
+          "weight": 0.8
+        },
+        {
+          "from": "n40",
+          "relation": "above",
+          "to": "n41",
+          "weight": 0.8
+        },
+        {
+          "from": "n40",
+          "relation": "left_of_same_row",
+          "to": "n45",
+          "weight": 0.8
+        },
+        {
+          "from": "n41",
+          "relation": "above",
+          "to": "n48",
+          "weight": 0.8
+        },
+        {
+          "from": "n41",
+          "relation": "left_of_same_row",
+          "to": "n46",
+          "weight": 0.8
+        },
+        {
+          "from": "n41",
+          "relation": "left_of_same_row",
+          "to": "n47",
+          "weight": 0.8
+        },
+        {
+          "from": "n42",
+          "relation": "above",
+          "to": "n45",
+          "weight": 0.8
+        },
+        {
+          "from": "n42",
+          "relation": "left_of_same_row",
+          "to": "n43",
+          "weight": 0.48
+        },
+        {
+          "from": "n43",
+          "relation": "left_of_same_row",
+          "to": "n44",
+          "weight": 0.48
+        },
+        {
+          "from": "n45",
+          "relation": "above",
+          "to": "n46",
+          "weight": 0.8
+        },
+        {
+          "from": "n46",
+          "relation": "above",
+          "to": "n47",
+          "weight": 0.8
+        },
+        {
+          "from": "n47",
+          "relation": "above",
+          "to": "n50",
+          "weight": 0.8
+        },
+        {
+          "from": "n48",
+          "relation": "above",
+          "to": "n49",
+          "weight": 0.48
+        },
+        {
+          "from": "n51",
+          "relation": "above",
+          "to": "n13",
+          "weight": 0.8
+        },
+        {
+          "from": "n51",
+          "relation": "above",
+          "to": "n20",
+          "weight": 0.8
+        }
+      ]
+    }
+  },
+  "options": {
+    "threshold": 0.8
   }
 }
+
 
 ###

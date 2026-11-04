@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 
 import executionRoute from './execution.route';
+import rowAuditRoute from './row-audit.route';
 import statsRoute from './stats.route';
 import { createLogger } from '../libs/logger';
 
@@ -25,5 +26,7 @@ router.use('/api/v1', statsRoute);
 router.use('/', statsRoute);
 router.use('/api/v1', executionRoute);
 router.use('/', executionRoute);
+router.use('/api/v1', rowAuditRoute);
+router.use('/', rowAuditRoute);
 logger.info('Routes loaded');
 export default router;

@@ -1,6 +1,6 @@
 import { REDIS_CHANNELS } from "../configs/redis.config";
 import { publishRealtimeEvent, closeRealtimeAdapter } from "../adapters/redis.adapter";
-import { ExecutionLogEvent, ExecutionStatusEvent } from "../types/realtime.type";
+import { ExecutionLogEvent, ExecutionStatusEvent, RowAuditResultEvent } from "../types/realtime.type";
 
 /**
  * Low-level realtime events publisher that delegates to the realtime adapter.
@@ -12,6 +12,10 @@ export async function publishExecutionLog(event: ExecutionLogEvent) {
 }
 export async function publishExecutionStatus(event: ExecutionStatusEvent) {
     await publishRealtimeEvent(REDIS_CHANNELS.status, event);
+}
+
+export async function publishRowAuditResult(event: RowAuditResultEvent) {
+    await publishRealtimeEvent(REDIS_CHANNELS.rowAuditResults, event);
 }
 
 export async function publishStopExecution(executionId: string) {

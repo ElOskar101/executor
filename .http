@@ -93,7 +93,7 @@ GET http://localhost:3017/api/v1/stats
 content-type: application/json
 
 ### GET request to example server
-POST http://localhost:3017/api/v1/row-audit
+POST {{localServer}}/api/v1/row-audit
 content-type: application/json
 
 {

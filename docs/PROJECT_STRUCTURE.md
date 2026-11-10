@@ -210,6 +210,8 @@ Redis channels defined in `../src/configs/redis.config.ts`:
 - `status`
 - `metrics`
 - `control`
+- `row-audit-results` (worker audit results)
+- `row-audit-errors` (worker audit failures)
 
 Control event types include:
 
@@ -222,6 +224,81 @@ Socket.io behavior:
 - the API listens to Redis events and re-broadcasts to connected clients
 - clients can join a room scoped to an execution for focused updates
 - event payloads are expected to include execution-specific metadata when relevant
+
+### Row audits between services
+
+`execution:row:audit` accepts the same `{ row, template, options }` payload as
+`POST /row-audit` (also available at `/api/v1/row-audit`). Socket requests require
+`row._id`, the original row ID from the sending service. MongoDB stores this value
+as `row.rowId`; the audit document has its own generated top-level `_id`. The
+`run-row-audit` job on the existing `row-audit` queue keeps the incoming `row._id`
+so workers receive the original payload. The HTTP endpoint stays available and
+still accepts older payloads without `row._id`.
+
+```js
+// On the service that owns the row (using a connected Socket.IO client):
+socket.on("execution:row:audit-result", ({ rowId, status, result, reason }) => {
+  // Apply the audit result or error to the original row using rowId.
+});
+
+socket.emit("execution:row:audit", { row, template, options }, (response) => {
+  // { ok: true, rowId, rowAuditId } once saved and queued,
+  // or { ok: false, error } if validation, persistence, or enqueueing fails.
+});
+```
+
+The external audit worker must publish a JSON result to Redis channel
+`row-audit-results` after processing a job. This repository provides the bridge;
+the worker implementation is outside this repository. Use `rowId` for the source
+row and `rowAuditId` for this service's audit record:
+
+```js
+await redis.publish("row-audit-results", JSON.stringify({
+  rowId: job.data.row._id,
+  rowAuditId: job.data.rowAuditId,
+  result: auditResult,
+}));
+```
+
+For a final failure, publish to `row-audit-errors`:
+
+```js
+await redis.publish("row-audit-errors", JSON.stringify({
+  rowAuditId: job.data.rowAuditId,
+  jobId: job.id,
+  reason: "Document validation API returned HTTP 503.",
+  attemptsMade: 3,
+  timestamp: "2026-11-09T12:00:00.000Z",
+}));
+```
+
+The audit document has its own top-level `status`, independent of the source
+row's `executionStatus`:
+
+| Status | Trigger |
+| --- | --- |
+| `queued` | The audit record is created for queueing. |
+| `running` | BullMQ's `active` event on the `row-audit` queue. |
+| `done` | A successful `row-audit-results` message. |
+| `failed` | A `row-audit-errors` message. |
+
+The row-audit queue module owns the BullMQ `QueueEvents` listener. It starts
+once when the API starts and closes with the queue. Its `active` callback calls
+the same realtime persister used by the Redis subscriber for `done` and `failed`.
+The row-audit status persister handles MongoDB writes; the socket service emits
+after the persister returns. Only `status` is persisted.
+Include `rowAuditId` to update the correct audit. Result messages containing
+only `rowId` are still broadcast without updating MongoDB.
+
+Both channels emit `execution:row:audit-result` to all connected clients without
+rooms. The payload retains its original fields, plus `status` and the source
+`rowId` from the stored `row.rowId`. Persistence errors are logged before
+forwarding the notification, following the existing execution event flow.
+
+This works for audits requested over HTTP or Socket.IO. Include `row._id` in
+HTTP requests too when results need to be correlated by the receiving service.
+The acknowledgement confirms queueing, not audit completion. Result delivery
+uses Redis Pub/Sub and does not replay missed events.
 
 ## 8) Persistence and log model
 

@@ -47,8 +47,7 @@
         "down"
       ]
     },
-    "anchors": [
-      {
+    "anchors": [{
         "id": "a1",
         "label": "Page 1",
         "normalized_text": "page 1",

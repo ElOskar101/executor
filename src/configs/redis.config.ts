@@ -5,6 +5,8 @@ export const REDIS_CHANNELS = {
     status: "status",
     metrics: "metrics",
     control: "control",
+    rowAuditResults: "row-audit-results",
+    rowAuditErrors: "row-audit-errors",
 } as const;
 
 export const EXECUTION_QUEUE_NAME = process.env.EXECUTION_QUEUE_NAME || "playwright-executions";

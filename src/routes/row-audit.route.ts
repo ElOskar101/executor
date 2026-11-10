@@ -39,6 +39,9 @@ const router = express.Router();
  *           type: object
  *           required: [audited, loaded, executed, readyToReview, executionStatus, storedFiles, formPayload, bot, cells]
  *           properties:
+ *             _id:
+ *               type: string
+ *               description: Source row ID, kept as _id in the audit job and stored as row.rowId in MongoDB. Required for socket audit requests; optional over HTTP.
  *             audited:
  *               type: string
  *             loaded:
@@ -94,6 +97,9 @@ const router = express.Router();
  *                   properties:
  *                     _id:
  *                       type: string
+ *                     status:
+ *                       type: string
+ *                       enum: [queued, running, done, failed]
  *                     createdAt:
  *                       type: string
  *                       format: date-time

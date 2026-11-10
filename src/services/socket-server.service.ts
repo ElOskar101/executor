@@ -6,6 +6,8 @@ import { createRedisConnection, REDIS_CHANNELS } from "../configs/redis.config";
 import { readExecutionLog } from "../adapters/mongo.adapter";
 import { createExecutionRealtimePersister } from "./execution-realtime-persister.service";
 import { ExecutionLogEvent, ExecutionStatusEvent } from "../types/realtime.type";
+import { PdfAuditPayload, RowAuditAcknowledgement } from "../types/row-audit.type";
+import { createRowAudit } from "./row-audit.service";
 
 let io: SocketServer | null = null;
 let subscriber: ReturnType<typeof createRedisConnection> | null = null;
@@ -43,6 +45,29 @@ export async function setupSocketServer(server: HttpServer) {
     });
 
     io.on("connection", (socket) => {
+        socket.on("execution:row:audit", async (
+            payload: PdfAuditPayload,
+            acknowledge?: (response: RowAuditAcknowledgement) => void,
+        ) => {
+            let response: RowAuditAcknowledgement;
+            try {
+                if (!payload?.row || !payload.template || !payload.options) {
+                    throw new Error("Row, template and options are required");
+                }
+                if (typeof payload.row._id !== "string" || !payload.row._id.trim()) {
+                    throw new Error("row._id is required for socket row audits");
+                }
+
+                const rowAudit = await createRowAudit(payload);
+                response = { ok: true, rowId: payload.row._id, rowAuditId: rowAudit._id.toString() };
+            } catch (error) {
+                console.error("[SOCKET] Failed to queue row audit", error);
+                response = { ok: false, error: error instanceof Error ? error.message : "Failed to queue row audit" };
+            }
+
+            if (typeof acknowledge === "function") acknowledge(response);
+        });
+
         socket.on("execution:join", async ({ executionId }: { executionId?: string }) => {
             if (!executionId) return;
 
@@ -60,10 +85,33 @@ export async function setupSocketServer(server: HttpServer) {
     });
 
     subscriber = createRedisConnection();
-    await subscriber.subscribe(REDIS_CHANNELS.logs, REDIS_CHANNELS.status, REDIS_CHANNELS.metrics);
+    await subscriber.subscribe(
+        REDIS_CHANNELS.logs,
+        REDIS_CHANNELS.status,
+        REDIS_CHANNELS.metrics,
+        REDIS_CHANNELS.rowAuditResults,
+        REDIS_CHANNELS.rowAuditErrors,
+    );
 
     subscriber.on("message", async (channel, message) => {
         const payload = parseMessage(message);
+        if (channel === REDIS_CHANNELS.rowAuditResults || channel === REDIS_CHANNELS.rowAuditErrors) {
+            //console.log(payload, 'The results of channel');
+            if (!payload?.rowAuditId && !payload?.rowId) return;
+            const status = channel === REDIS_CHANNELS.rowAuditResults ? "done" : "failed";
+            let rowId = payload.rowId;
+            try {
+                if (payload.rowAuditId) {
+                    const audit = await realtimePersister.persistRowAuditStatus(payload.rowAuditId, status);
+                    rowId = audit?.row.rowId || rowId;
+                }
+            } catch (error) {
+                console.error("[SOCKET] Failed to update row audit status", error);
+            }
+            io?.emit("execution:row:audit-result", { ...payload, rowId, status });
+            return;
+        }
+
         const executionId = payload.executionId;
 
         try {

@@ -16,6 +16,7 @@ const patient = new Schema({
 }, { _id: false, versionKey: false, timestamps: false });
 
 const row = new Schema({
+    rowId: { type: String, required: false },
     audited: { type: String, required: false },
     loaded: { type: Boolean, required: true },
     executed: { type: Boolean, required: true },
@@ -28,6 +29,7 @@ const row = new Schema({
 }, { _id: false, versionKey: false, timestamps: false });
 
 const RowAuditSchema = new Schema({
+    status: { type: String, enum: ["queued", "running", "done", "failed"], default: "queued" },
     row: { type: row, required: true },
     template: { type: Schema.Types.Mixed, required: true },
     options: {

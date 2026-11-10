@@ -14,6 +14,8 @@ export interface Patient {
 }
 
 interface Row {
+    // Source database ID; stored locally as row.rowId.
+    _id?: string;
     "audited": string,
     "loaded": boolean,
     "executed": boolean,
@@ -38,3 +40,7 @@ export interface PdfAuditPayload {
 export interface RowAuditJobData extends PdfAuditPayload {
     rowAuditId: string;
 }
+
+export type RowAuditAcknowledgement =
+    | { ok: true; rowId: string; rowAuditId: string }
+    | { ok: false; error: string };

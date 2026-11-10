@@ -1,6 +1,6 @@
 import { ExecutionStatus } from "./execution.type";
 
-export type RedisRealtimeChannel = "logs" | "status" | "metrics";
+export type RedisRealtimeChannel = "logs" | "status" | "metrics" | "row-audit-results" | "row-audit-errors";
 
 export interface ExecutionLogEvent {
     executionId: string;
@@ -23,5 +23,20 @@ export interface ExecutionStatusEvent {
 export interface ExecutionMetricsEvent {
     workerId: string;
     activeExecutions: number;
+    timestamp: string;
+}
+
+export interface RowAuditResultEvent {
+    rowId?: string;
+    rowAuditId?: string;
+    result?: unknown;
+    error?: string;
+}
+
+export interface RowAuditErrorEvent {
+    rowAuditId: string;
+    jobId: string;
+    reason: string;
+    attemptsMade: number;
     timestamp: string;
 }

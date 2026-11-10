@@ -4,7 +4,7 @@ import {connectDb} from "./connection.db";
 import app from './app';
 import { setupSocketServer, closeSocketServer } from './services/socket-server.service';
 import {closeExecutionQueue} from './queues/execution.queue';
-import {closeRowAuditQueue} from './queues/row-audit.queue';
+import {closeRowAuditQueue, getRowAuditQueueEvents} from './queues/row-audit.queue';
 import { closeRealtimePublisher } from './services/realtime.service';
 import { startReportCleanupCron } from './crons/report-cleaner.cron';
 import { createLogger } from './libs/logger';
@@ -17,6 +17,7 @@ const logger = createLogger('server');
 // Start DB and only start the HTTP server once DB connectionString is established.
 connectDb()
     .then(async () => {
+      await getRowAuditQueueEvents().waitUntilReady();
       const reportCleanupTask = startReportCleanupCron();
 
       const server = app.listen(PORT, () => {

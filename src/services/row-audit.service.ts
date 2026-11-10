@@ -10,8 +10,9 @@ export async function createRowAudit(payload: PdfAuditPayload) {
 }
 
 async function enqueueRowAudit(payload: PdfAuditPayload) {
+    const { _id: rowId, ...row } = payload.row;
     const rowAudit = await RowAuditModel.create({
-        row: payload.row,
+        row: rowId === undefined ? row : { ...row, rowId },
         template: payload.template,
         options: payload.options,
     });

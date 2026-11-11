@@ -72,7 +72,10 @@ test("socket audit uses the existing save/queue flow and acknowledges the row ID
     await onAudit(payload, acknowledge);
 
     assert.deepEqual(add.mock.calls[0].arguments, [
-        "run-row-audit", { rowAuditId: document.id, ...payload }, { jobId: document.id },
+        "run-row-audit", {
+            rowAuditId: document.id, _id: payload.row._id,
+            ...payload, config: payload.options,
+        }, { jobId: document.id },
     ]);
     assert.deepEqual(acknowledge.mock.calls[0].arguments, [{
         ok: true, rowId: payload.row._id, rowAuditId: document.id,
@@ -153,6 +156,7 @@ test("Redis audit results are broadcast without rooms, including results with an
 test("Redis results without an audit ID are forwarded and unidentifiable results are ignored", async (t) => {
     const { io, onMessage } = await setup(t);
     const { emit } = mockAuditBroadcast(t, io);
+    const warn = t.mock.method(console, "warn", () => {});
     const result = { rowId: "source-row-123", result: { passed: true } };
 
     await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, JSON.stringify(result));
@@ -161,6 +165,7 @@ test("Redis results without an audit ID are forwarded and unidentifiable results
     }
 
     assert.equal(emit.mock.callCount(), 1);
+    assert.equal(warn.mock.callCount(), 4);
     assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", { ...result, status: "done" }]);
 });
 
@@ -187,6 +192,57 @@ test("row-audit-errors sets failed and forwards the error with its source row ID
         ...failure, rowId: "source-row-123", status: "failed",
     }]);
     assert.equal(to.mock.callCount(), 0);
+});
+
+test("row-audit-errors uses the BullMQ job ID when the runner omits rowAuditId", async (t) => {
+    const { io, onMessage } = await setup(t);
+    const { emit } = mockAuditBroadcast(t, io);
+    const error = { jobId: "507f191e810c19729de860ea", reason: "HTTP 503" };
+    const update = t.mock.method(RowAuditModel, "findByIdAndUpdate", () => ({
+        lean: async () => ({ row: { rowId: "source-row-123" }, status: "failed" }),
+    }));
+
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditErrors, JSON.stringify(error));
+
+    assert.equal(update.mock.calls[0].arguments[0], error.jobId);
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", {
+        ...error, rowAuditId: error.jobId, rowId: "source-row-123", status: "failed",
+    }]);
+});
+
+test("row-audit-errors falls back to the job ID when rowAuditId is the source row ID", async (t) => {
+    const { io, onMessage } = await setup(t);
+    const { emit } = mockAuditBroadcast(t, io);
+    const error = { rowAuditId: "507f191e810c19729de860eb", jobId: "507f191e810c19729de860ea", reason: "HTTP 503" };
+    const update = t.mock.method(RowAuditModel, "findByIdAndUpdate", (id: string) => ({
+        lean: async () => id === error.jobId ? { row: { rowId: error.rowAuditId }, status: "failed" } : null,
+    }));
+
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditErrors, JSON.stringify(error));
+
+    assert.deepEqual(update.mock.calls.map((call) => call.arguments[0]), [error.rowAuditId, error.jobId]);
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", {
+        ...error, rowAuditId: error.jobId, rowId: error.rowAuditId, status: "failed",
+    }]);
+});
+
+test("row-audit-errors still falls back when the source row ID is not a Mongo ID", async (t) => {
+    const { io, onMessage } = await setup(t);
+    const { emit } = mockAuditBroadcast(t, io);
+    const warn = t.mock.method(console, "warn", () => {});
+    const error = { rowAuditId: "source-row-123", jobId: "507f191e810c19729de860ea", reason: "HTTP 503" };
+    const update = t.mock.method(RowAuditModel, "findByIdAndUpdate", (id: string) => {
+        if (id === error.rowAuditId) throw new Error("CastError");
+        return { lean: async () => ({ row: { rowId: error.rowAuditId }, status: "failed" }) };
+    });
+
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditErrors, JSON.stringify(error));
+
+    assert.deepEqual(update.mock.calls.map((call) => call.arguments[0]), [error.rowAuditId, error.jobId]);
+    assert.equal(warn.mock.callCount(), 1);
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", {
+        ...error, rowAuditId: error.jobId, rowId: error.rowAuditId, status: "failed",
+    }]);
 });
 
 test("audit results still broadcast if Mongo persistence fails", async (t) => {

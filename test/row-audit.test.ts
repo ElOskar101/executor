@@ -35,7 +35,7 @@ test("row audit service saves the payload and enqueues it with the record ID", a
 
     assert.deepEqual(create.mock.calls[0].arguments, [payload]);
     assert.deepEqual(add.mock.calls[0].arguments, [
-        "run-row-audit", { rowAuditId: document.id, ...payload }, { jobId: document.id },
+        "run-row-audit", { rowAuditId: document.id, ...payload, config: payload.options }, { jobId: document.id },
     ]);
     assert.deepEqual(result, document.toObject());
     assert.equal(result.status, "queued");
@@ -60,7 +60,10 @@ test("row audit stores the source _id as rowId and keeps the incoming job payloa
     assert.notEqual(result._id.toString(), "source-row-123");
     assert.deepEqual(identifiedPayload, originalPayload);
     assert.deepEqual(add.mock.calls[0].arguments, [
-        "run-row-audit", { rowAuditId: result._id.toString(), ...identifiedPayload }, { jobId: result._id.toString() },
+        "run-row-audit", {
+            rowAuditId: result._id.toString(), _id: "source-row-123",
+            ...identifiedPayload, config: identifiedPayload.options,
+        }, { jobId: result._id.toString() },
     ]);
 });
 

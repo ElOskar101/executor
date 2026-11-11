@@ -38,6 +38,8 @@ export interface PdfAuditPayload {
 }
 
 export interface RowAuditJobData extends PdfAuditPayload {
+    _id?: string;
+    config: PdfAuditPayload["options"];
     rowAuditId: string;
 }
 

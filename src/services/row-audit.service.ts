@@ -19,9 +19,11 @@ async function enqueueRowAudit(payload: PdfAuditPayload) {
 
     const jobData: RowAuditJobData = {
         rowAuditId: rowAudit.id,
+        ...(rowId === undefined ? {} : { _id: rowId }),
         row: payload.row,
         template: payload.template,
         options: payload.options,
+        config: payload.options,
     };
 
     const job = await getRowAuditQueue().add("run-row-audit", jobData, {

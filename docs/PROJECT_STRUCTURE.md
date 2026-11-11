@@ -232,7 +232,8 @@ Socket.io behavior:
 `row._id`, the original row ID from the sending service. MongoDB stores this value
 as `row.rowId`; the audit document has its own generated top-level `_id`. The
 `run-row-audit` job on the existing `row-audit` queue keeps the incoming `row._id`
-so workers receive the original payload. The HTTP endpoint stays available and
+and also sends it as top-level `_id`, as expected by the document-validation runner.
+The job includes `config` from `options.threshold`. The HTTP endpoint stays available and
 still accepts older payloads without `row._id`.
 
 ```js
@@ -295,6 +296,8 @@ The row-audit status persister handles MongoDB writes; the socket service emits
 after the persister returns. Only `status` is persisted.
 Include `rowAuditId` to update the correct audit. Result messages containing
 only `rowId` are still broadcast without updating MongoDB.
+For error messages, the subscriber can use `jobId` to find the audit when the
+runner omits `rowAuditId` or sends the source row ID instead.
 
 Both channels emit `execution:row:audit-result` to all connected clients without
 rooms. The payload retains its original fields, plus `status` and the source

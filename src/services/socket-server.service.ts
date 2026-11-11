@@ -96,33 +96,46 @@ export async function setupSocketServer(server: HttpServer) {
     subscriber.on("message", async (channel, message) => {
         const payload = parseMessage(message);
         if (channel === REDIS_CHANNELS.rowAuditResults || channel === REDIS_CHANNELS.rowAuditErrors) {
-            //console.log(payload, 'The results of channel');
-            if (!payload?.rowAuditId && !payload?.rowId) return;
+            if (!payload?.rowAuditId && !payload?.jobId && !payload?.rowId) {
+                console.warn("[SOCKET] Row audit event has no audit, job, or row ID", { channel });
+                return;
+            }
             const status = channel === REDIS_CHANNELS.rowAuditResults ? "done" : "failed";
             let rowId = payload.rowId;
-            console.log('The results ',payload);
+            let rowAuditId = payload.rowAuditId || payload.jobId;
             try {
-                if (payload.rowAuditId) {
-                    const audit = await realtimePersister.persistRowAuditStatus(payload.rowAuditId, status);
+                if (rowAuditId) {
+                    let audit;
+                    try {
+                        audit = await realtimePersister.persistRowAuditStatus(rowAuditId, status);
+                    } catch (error) {
+                        if (!payload.jobId || payload.jobId === rowAuditId) throw error;
+                        console.warn("[SOCKET] Row audit ID lookup failed; trying job ID", { rowAuditId, jobId: payload.jobId });
+                    }
+                    if (!audit && payload.jobId && payload.jobId !== rowAuditId) {
+                        audit = await realtimePersister.persistRowAuditStatus(payload.jobId, status);
+                        if (audit) rowAuditId = payload.jobId;
+                    }
                     rowId = audit?.row.rowId || rowId;
+                    if (!audit) console.warn("[SOCKET] Row audit record not found", { channel, rowAuditId, jobId: payload.jobId });
                 }
             } catch (error) {
                 console.error("[SOCKET] Failed to update row audit status", error);
             }
             if (!io?.sockets.sockets.size) {
-                console.warn("[SOCKET] No connected clients for row audit result", { rowAuditId: payload.rowAuditId, rowId });
+                console.warn("[SOCKET] No connected clients for row audit result", { rowAuditId, rowId });
                 return;
             }
 
-            io.timeout(5000).emit("execution:row:audit-result", { ...payload, rowId, status }, (
+            io.timeout(5000).emit("execution:row:audit-result", { ...payload, ...(rowAuditId ? { rowAuditId } : {}), rowId, status }, (
                 error: Error | null,
                 responses: Array<{ ok?: boolean } | undefined>,
             ) => {
                 if (error || !responses.length || responses.some((response) => response?.ok !== true)) {
-                    console.error("[SOCKET] Row audit result was not acknowledged by all clients", error || responses);
+                    console.error("[SOCKET] Row audit result was not acknowledged by all clients", { rowAuditId, rowId, error, responses });
                     return;
                 }
-                console.info(`[SOCKET] Row audit result acknowledged by ${responses.length} client(s)`);
+                console.info(`[SOCKET] Row audit result acknowledged by ${responses.length} client(s)`, { rowAuditId, rowId });
             });
             return;
         }

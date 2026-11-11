@@ -100,6 +100,7 @@ export async function setupSocketServer(server: HttpServer) {
             if (!payload?.rowAuditId && !payload?.rowId) return;
             const status = channel === REDIS_CHANNELS.rowAuditResults ? "done" : "failed";
             let rowId = payload.rowId;
+            console.log('The results ',payload);
             try {
                 if (payload.rowAuditId) {
                     const audit = await realtimePersister.persistRowAuditStatus(payload.rowAuditId, status);
@@ -108,7 +109,21 @@ export async function setupSocketServer(server: HttpServer) {
             } catch (error) {
                 console.error("[SOCKET] Failed to update row audit status", error);
             }
-            io?.emit("execution:row:audit-result", { ...payload, rowId, status });
+            if (!io?.sockets.sockets.size) {
+                console.warn("[SOCKET] No connected clients for row audit result", { rowAuditId: payload.rowAuditId, rowId });
+                return;
+            }
+
+            io.timeout(5000).emit("execution:row:audit-result", { ...payload, rowId, status }, (
+                error: Error | null,
+                responses: Array<{ ok?: boolean } | undefined>,
+            ) => {
+                if (error || !responses.length || responses.some((response) => response?.ok !== true)) {
+                    console.error("[SOCKET] Row audit result was not acknowledged by all clients", error || responses);
+                    return;
+                }
+                console.info(`[SOCKET] Row audit result acknowledged by ${responses.length} client(s)`);
+            });
             return;
         }
 

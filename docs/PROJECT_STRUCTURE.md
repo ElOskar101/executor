@@ -237,8 +237,14 @@ still accepts older payloads without `row._id`.
 
 ```js
 // On the service that owns the row (using a connected Socket.IO client):
-socket.on("execution:row:audit-result", ({ rowId, status, result, reason }) => {
-  // Apply the audit result or error to the original row using rowId.
+socket.on("execution:row:audit-result", async ({ rowId, status, result, reason }, acknowledge) => {
+  try {
+    // Apply the audit result or error to the original row using rowId.
+    await updateRowById(rowId, { status, result, reason });
+    acknowledge({ ok: true });
+  } catch (error) {
+    acknowledge({ ok: false });
+  }
 });
 
 socket.emit("execution:row:audit", { row, template, options }, (response) => {
@@ -294,6 +300,10 @@ Both channels emit `execution:row:audit-result` to all connected clients without
 rooms. The payload retains its original fields, plus `status` and the source
 `rowId` from the stored `row.rowId`. Persistence errors are logged before
 forwarding the notification, following the existing execution event flow.
+The server checks for connected clients and waits up to five seconds for every
+client to acknowledge the broadcast. It logs missing or negative acknowledgements.
+Clients should acknowledge only after processing the result. This confirms
+receipt by connected clients; disconnected clients still need a recovery path.
 
 This works for audits requested over HTTP or Socket.IO. Include `row._id` in
 HTTP requests too when results need to be correlated by the receiving service.

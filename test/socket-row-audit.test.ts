@@ -38,13 +38,27 @@ async function setup(t: TestContext) {
     t.after(() => closeSocketServer());
 
     // Dispatch through the registered handlers without needing Redis or a network client.
-    const socket = new EventEmitter();
+    const socket = Object.assign(new EventEmitter(), { disconnect: () => {} });
     for (const onConnection of io.sockets.listeners("connection")) onConnection(socket as unknown as Socket);
+    io.sockets.sockets.set("test-client", socket as unknown as Socket);
     const onAudit = socket.listeners("execution:row:audit")[0];
     const onMessage = subscriber.listeners("message")[0];
     assert.ok(onAudit);
     assert.ok(onMessage);
     return { io, subscriber, onAudit, onMessage };
+}
+
+function mockAuditBroadcast(t: TestContext, io: Awaited<ReturnType<typeof setupSocketServer>>) {
+    const emit = t.mock.fn((
+        _event: string,
+        _payload: unknown,
+        acknowledge: (error: Error | null, responses: Array<{ ok?: boolean }>) => void,
+    ) => {
+        acknowledge(null, [{ ok: true }]);
+    });
+    const timeout = t.mock.method(io, "timeout", () => ({ emit } as unknown as ReturnType<typeof io.timeout>));
+    const info = t.mock.method(console, "info", () => {});
+    return { emit, timeout, info };
 }
 
 test("socket audit uses the existing save/queue flow and acknowledges the row IDs", async (t) => {
@@ -105,7 +119,7 @@ test("socket audit accepts requests without an acknowledgement callback", async 
 
 test("Redis audit results are broadcast without rooms, including results with an execution ID", async (t) => {
     const { io, subscriber, onMessage } = await setup(t);
-    const emit = t.mock.method(io, "emit", () => true);
+    const { emit, timeout, info } = mockAuditBroadcast(t, io);
     const to = t.mock.method(io, "to", () => { throw new Error("Audit results must not use rooms"); });
     const publish = t.mock.method(redisAdapter, "publishRealtimeEvent", async (
         channel: Parameters<typeof redisAdapter.publishRealtimeEvent>[0], event: unknown,
@@ -126,17 +140,19 @@ test("Redis audit results are broadcast without rooms, including results with an
     await publishRowAuditResult(event);
 
     assert.ok(subscriber.subscribe.mock.calls[0].arguments.includes("row-audit-results"));
+    assert.deepEqual(timeout.mock.calls[0].arguments, [5000]);
     assert.deepEqual(publish.mock.calls[0].arguments, ["row-audit-results", event]);
     assert.equal(update.mock.calls[0].arguments[0], event.rowAuditId);
     const change = update.mock.calls[0].arguments[1];
     assert.deepEqual(change, { status: "done" });
-    assert.deepEqual(emit.mock.calls[0].arguments, ["execution:row:audit-result", { ...event, status: "done" }]);
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", { ...event, status: "done" }]);
+    assert.equal(info.mock.callCount(), 1);
     assert.equal(to.mock.callCount(), 0);
 });
 
 test("Redis results without an audit ID are forwarded and unidentifiable results are ignored", async (t) => {
     const { io, onMessage } = await setup(t);
-    const emit = t.mock.method(io, "emit", () => true);
+    const { emit } = mockAuditBroadcast(t, io);
     const result = { rowId: "source-row-123", result: { passed: true } };
 
     await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, JSON.stringify(result));
@@ -145,12 +161,12 @@ test("Redis results without an audit ID are forwarded and unidentifiable results
     }
 
     assert.equal(emit.mock.callCount(), 1);
-    assert.deepEqual(emit.mock.calls[0].arguments, ["execution:row:audit-result", { ...result, status: "done" }]);
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", { ...result, status: "done" }]);
 });
 
 test("row-audit-errors sets failed and forwards the error with its source row ID", async (t) => {
     const { io, subscriber, onMessage } = await setup(t);
-    const emit = t.mock.method(io, "emit", () => true);
+    const { emit } = mockAuditBroadcast(t, io);
     const to = t.mock.method(io, "to", () => { throw new Error("Errors must not use rooms"); });
     const failure = {
         rowAuditId: "audit-123", jobId: "123",
@@ -167,7 +183,7 @@ test("row-audit-errors sets failed and forwards the error with its source row ID
 
     assert.ok(subscriber.subscribe.mock.calls[0].arguments.includes("row-audit-errors"));
     assert.deepEqual(update.mock.calls[0].arguments, [failure.rowAuditId, { status: "failed" }, { new: true }]);
-    assert.deepEqual(emit.mock.calls[0].arguments, ["execution:row:audit-result", {
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", {
         ...failure, rowId: "source-row-123", status: "failed",
     }]);
     assert.equal(to.mock.callCount(), 0);
@@ -175,12 +191,47 @@ test("row-audit-errors sets failed and forwards the error with its source row ID
 
 test("audit results still broadcast if Mongo persistence fails", async (t) => {
     const { io, onMessage } = await setup(t);
-    const emit = t.mock.method(io, "emit", () => true);
+    const { emit } = mockAuditBroadcast(t, io);
     t.mock.method(console, "error", () => {});
     t.mock.method(RowAuditModel, "findByIdAndUpdate", () => { throw new Error("Mongo unavailable"); });
     const event = { rowId: "source-row-123", rowAuditId: "audit-123", result: { passed: true } };
 
     await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, JSON.stringify(event));
 
-    assert.deepEqual(emit.mock.calls[0].arguments, ["execution:row:audit-result", { ...event, status: "done" }]);
+    assert.deepEqual(emit.mock.calls[0].arguments.slice(0, 2), ["execution:row:audit-result", { ...event, status: "done" }]);
+});
+
+test("audit result reports when no client is connected", async (t) => {
+    const { io, onMessage } = await setup(t);
+    io.sockets.sockets.clear();
+    const { emit } = mockAuditBroadcast(t, io);
+    const warn = t.mock.method(console, "warn", () => {});
+
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, JSON.stringify({ rowId: "source-row-123" }));
+
+    assert.equal(emit.mock.callCount(), 0);
+    assert.equal(warn.mock.callCount(), 1);
+});
+
+test("audit result reports missing and negative client acknowledgements", async (t) => {
+    const { io, onMessage } = await setup(t);
+    const logError = t.mock.method(console, "error", () => {});
+    const emit = t.mock.fn((
+        _event: string,
+        _payload: unknown,
+        acknowledge: (error: Error | null, responses: Array<{ ok?: boolean }>) => void,
+    ) => acknowledge(new Error("timeout"), []));
+    t.mock.method(io, "timeout", () => ({ emit } as unknown as ReturnType<typeof io.timeout>));
+    const message = JSON.stringify({ rowId: "source-row-123" });
+
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, message);
+    assert.equal(logError.mock.callCount(), 1);
+
+    emit.mock.mockImplementation((_event, _payload, acknowledge) => acknowledge(null, [{ ok: false }]));
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, message);
+    assert.equal(logError.mock.callCount(), 2);
+
+    emit.mock.mockImplementation((_event, _payload, acknowledge) => acknowledge(null, []));
+    await onMessage(redisConfig.REDIS_CHANNELS.rowAuditResults, message);
+    assert.equal(logError.mock.callCount(), 3);
 });
